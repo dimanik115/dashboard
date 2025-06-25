@@ -1,0 +1,259 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Dashboard | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/trades/list": {
+      "post": {
+        "tags": [
+          "TradesApi"
+        ],
+        "summary": "Получить все сделки с учетом фильтрации и пагинации",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Trade"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/trades/getseedmoney": {
+      "get": {
+        "tags": [
+          "TradesApi"
+        ],
+        "summary": "Получить количество вложенных денег",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Broker": {
+        "enum": [
+          "Alpha",
+          "Bcs",
+          "T",
+          "Sber",
+          "Finam",
+          "Vtb",
+          "Cifra",
+          "Mkb",
+          "Gpb",
+          "Mts"
+        ]
+      },
+      "BuySell": {
+        "enum": [
+          "B",
+          "S"
+        ]
+      },
+      "Currency": {
+        "enum": [
+          "RUB",
+          "USD",
+          "EUR"
+        ]
+      },
+      "Filter": {
+        "required": [
+          "logicalOperation",
+          "items"
+        ],
+        "type": [
+          "null",
+          "object"
+        ],
+        "properties": {
+          "logicalOperation": {
+            "$ref": "#/components/schemas/LogicalOperation"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterItem"
+            }
+          }
+        },
+        "description": "Фильтр"
+      },
+      "FilterItem": {
+        "required": [
+          "field",
+          "value",
+          "filterOperation"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "value": { },
+          "filterOperation": {
+            "$ref": "#/components/schemas/FilterOperation"
+          }
+        }
+      },
+      "FilterOperation": {
+        "enum": [
+          "Equal",
+          "NotEqual",
+          "GreaterThan",
+          "GreaterThanOrEqual",
+          "LessThan",
+          "LessThanOrEqual",
+          "Contains",
+          "In"
+        ]
+      },
+      "LogicalOperation": {
+        "enum": [
+          "And",
+          "Or"
+        ]
+      },
+      "QueryParams": {
+        "type": "object",
+        "properties": {
+          "sort": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Sort"
+            },
+            "description": "Сортировка"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "page": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Номер страницы",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Число записей на странице",
+            "format": "int32"
+          }
+        }
+      },
+      "Sort": {
+        "required": [
+          "direction",
+          "field"
+        ],
+        "type": "object",
+        "properties": {
+          "direction": {
+            "$ref": "#/components/schemas/SortDirection"
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "description": "модель сортировки"
+      },
+      "SortDirection": {
+        "enum": [
+          "Asc",
+          "Desc"
+        ],
+        "description": "Направления сортировки"
+      },
+      "Trade": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "tradeDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "avgPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sum": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "buySell": {
+            "$ref": "#/components/schemas/BuySell"
+          },
+          "broker": {
+            "$ref": "#/components/schemas/Broker"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "TradesApi"
+    }
+  ]
+}
