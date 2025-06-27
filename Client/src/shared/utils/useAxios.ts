@@ -5,7 +5,7 @@ import axios from 'axios';
  * возвращает сконфигурированный инстанс аксиоса
  */
 export const useAxios = (path: string = 'api/v1/') => {
-  const baseURL = useConfiguration().urls['api'];
+  const baseURL = useConfiguration().urls.api;
   const instance = axios.create({
     baseURL: baseURL + path,
     timeout: 10_000,

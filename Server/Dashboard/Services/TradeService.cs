@@ -11,7 +11,11 @@ public class TradeService(IConfiguration configuration)
 
     public async Task<IEnumerable<Trade>> GetAll(QueryParams queryParams)
     {
-        var result = MiniExcel.Query<Trade>(path, "сделки")
+        var result = MiniExcel.Query<Trade>(path, "сделки").Select((x, i) =>
+            {
+                x.Id = i + 1;
+                return x;
+            })
             .WithParams(queryParams);
         return result.ToList();
     }

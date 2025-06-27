@@ -5,6 +5,9 @@ namespace Dashboard.Models;
 
 public class Trade
 {
+    [ExcelIgnore]
+    public int Id { get; set; }
+
     public string Ticker { get; set; } = null!;
 
     // [ExcelFormat("o")]

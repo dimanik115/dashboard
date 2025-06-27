@@ -8,6 +8,7 @@ import router from './router';
 import Aura from '@primeuix/themes/aura';
 import { all } from 'primelocale';
 import Ripple from 'primevue/ripple';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 
 const app = createApp(App);
 
@@ -23,4 +24,5 @@ app.use(PrimeVue, {
     // all.ru
     all.en,
 });
+app.use(VueQueryPlugin);
 app.mount('#app');
