@@ -20,9 +20,9 @@ public static class TradesApi
     [EndpointSummary("Получить количество вложенных денег")]
     [Produces<int>]
     [ProducesResponseType(400)]
-    private static Results<Ok<int>, BadRequest<string>> GetSeedMoney([AsParameters] GetSeedMoneyRequest requests)
+    private static IResult GetSeedMoney([AsParameters] GetSeedMoneyRequest requests)
     {
-        return TypedResults.Ok(requests.Service.GetSeedMoney());
+        return Results.Ok(requests.Service.GetSeedMoney());
     }
 
     [EndpointSummary("Получить все сделки с учетом фильтрации и пагинации")]

@@ -11,10 +11,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref } from 'vue';
 import { PrimeIcons } from '@primevue/core/api';
-import { useRouter } from "vue-router";
-import type { MenuItem } from "primevue/menuitem";
+import { useRouter } from 'vue-router';
+import type { MenuItem } from 'primevue/menuitem';
 
 const router = useRouter();
 
@@ -29,28 +29,25 @@ const items = ref<MenuItem[]>([
     icon: PrimeIcons.TABLE,
     command: () => {
       router.push('/trades');
-    }
+    },
   },
   {
-    label: 'Favourites',
+    label: 'Bookmarks',
     icon: PrimeIcons.BOOKMARK,
-    command:
-      () => {
-        router.push('/favourites');
-      }
-
-  }
+    command: () => {
+      router.push('/bookmarks');
+    },
+  },
 ]);
 </script>
 
 <style scoped>
-/*.menu {
+.menu {
   --p-menubar-background: #e5ffde;
   padding-bottom: 40px;
-}*/
+}
 
-/*.p-menubar {
+.p-menubar {
   justify-content: center;
-
-}*/
+}
 </style>

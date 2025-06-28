@@ -12,6 +12,7 @@ builder.Services.AddCors(o =>
     o.AddPolicy("all", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 builder.Services.AddScoped<TradeService>();
+builder.Services.AddScoped<BookmarkService>();
 
 var app = builder.Build();
 
@@ -22,5 +23,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("all");
+
 app.MapTradesApi();
+app.MapBookmarksApi();
+
 app.Run();

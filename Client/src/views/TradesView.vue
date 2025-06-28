@@ -1,5 +1,11 @@
 <template>
-  <div class="">
+  <div :class="{ 'all-hide': isToggled }">
+    <ToggleButton v-model="isToggled" onLabel="Раскрыть" offLabel="Скрыть" />
+    <div class="my-field">
+      <h3>
+        Вложено: <span :class="{ 'my-hide': isToggled }" v-if="isSuccess">{{ formatCurrency(seedMoney!, 0) }}</span>
+      </h3>
+    </div>
     <DataTable
       v-model:filters="filters"
       v-model:selection="selected"
@@ -86,11 +92,12 @@
 import { computed, ref } from 'vue';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import type { DataTableFilterMeta } from 'primevue/datatable';
-import { useTrades } from '@/shared/api/TradesApi.ts';
+import { useSeedMoney, useTrades } from '@/shared/api/TradesApi.ts';
 import { formatDate } from '@/shared/utils/date';
 import { formatCurrency } from '@/shared/utils/num';
 import { useBrokerOptions, useBuySellOptions, useCurrencyOptions } from '@/shared/utils/enums';
 
+const isToggled = ref(false);
 const filters = ref<DataTableFilterMeta>();
 const initFilters = () => {
   filters.value = {
@@ -122,8 +129,9 @@ const initFilters = () => {
 const clearFilter = () => {
   initFilters();
 };
-initFilters();
 
+initFilters();
+const { data: seedMoney, isSuccess } = useSeedMoney();
 const selected = ref();
 const { data, isLoading } = useTrades({});
 const trades = computed(() =>
@@ -132,7 +140,25 @@ const trades = computed(() =>
 </script>
 
 <style scoped>
-.p {
-  background-color: rgb(1, 254, 117);
+.my-field {
+  padding-bottom: 40px;
+  color: hsla(160, 100%, 37%, 1);
+}
+.all-hide {
+  .my-hide,
+  :deep(.p-datatable-column-title) {
+    visibility: hidden;
+    justify-content: center;
+    &::before {
+      content: '-';
+      visibility: visible;
+      color: red;
+      font-size: xx-large;
+      align-self: center;
+    }
+  }
+  :deep(tr:nth-child(n + 1)) {
+    color: rgba(0, 0, 0, 0);
+  }
 }
 </style>

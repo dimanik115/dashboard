@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!--    <NoWarn>CS1591</NoWarn>-->
+    <NoWarn>CS1591</NoWarn>
 
     <Configurations>Debug;Release;LocalRelease</Configurations>
   </PropertyGroup>
