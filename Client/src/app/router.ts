@@ -10,6 +10,7 @@ const router = createRouter({
       component: HomeView,
     },
     { path: '/bookmarks', name: 'bookmarks', component: () => import('../views/BookmarksView.vue') },
+    { path: '/statistics', name: 'statistics', component: () => import('../views/StatisticsView.vue') },
     {
       path: '/trades',
       name: 'trades',

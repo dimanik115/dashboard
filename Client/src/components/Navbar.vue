@@ -25,18 +25,19 @@ const items = ref<MenuItem[]>([
     command: () => router.push('/'),
   },
   {
+    label: 'Statistics',
+    icon: PrimeIcons.CHART_LINE,
+    command: () => router.push('/statistics'),
+  },
+  {
     label: 'Trades',
     icon: PrimeIcons.TABLE,
-    command: () => {
-      router.push('/trades');
-    },
+    command: () => router.push('/trades'),
   },
   {
     label: 'Bookmarks',
     icon: PrimeIcons.BOOKMARK,
-    command: () => {
-      router.push('/bookmarks');
-    },
+    command: () => router.push('/bookmarks'),
   },
 ]);
 </script>

@@ -117,6 +117,30 @@ export const SortDirection = {
   DESC: 'Desc',
 } as const;
 
+export type Statistics = {
+  /**
+   * Id
+   */
+  id: number;
+  /**
+   * Тикер
+   */
+  ticker: string;
+  /**
+   * Средняя цена в целом
+   */
+  avgPrice: number;
+  /**
+   * Сумма по количеству штук
+   */
+  sumCount: number;
+  /**
+   * Сумма по объему денег
+   */
+  total: number;
+  currency: Currency;
+};
+
 export type Trade = {
   id?: number;
   ticker?: string;
@@ -175,6 +199,29 @@ export type GetApiV1TradesGetseedmoneyResponses = {
 
 export type GetApiV1TradesGetseedmoneyResponse =
   GetApiV1TradesGetseedmoneyResponses[keyof GetApiV1TradesGetseedmoneyResponses];
+
+export type GetApiV1StatisticsListData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/statistics/list';
+};
+
+export type GetApiV1StatisticsListErrors = {
+  /**
+   * Bad Request
+   */
+  400: unknown;
+};
+
+export type GetApiV1StatisticsListResponses = {
+  /**
+   * OK
+   */
+  200: Array<Statistics>;
+};
+
+export type GetApiV1StatisticsListResponse = GetApiV1StatisticsListResponses[keyof GetApiV1StatisticsListResponses];
 
 export type GetApiV1BookmarksListData = {
   body?: never;

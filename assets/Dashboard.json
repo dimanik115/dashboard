@@ -65,6 +65,32 @@
         }
       }
     },
+    "/api/v1/statistics/list": {
+      "get": {
+        "tags": [
+          "StatisticsApi"
+        ],
+        "summary": "Получить статистику",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Statistics"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/api/v1/bookmarks/list": {
       "get": {
         "tags": [
@@ -259,6 +285,46 @@
         ],
         "description": "Направления сортировки"
       },
+      "Statistics": {
+        "required": [
+          "id",
+          "ticker",
+          "avgPrice",
+          "sumCount",
+          "total",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id",
+            "format": "int32"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Тикер"
+          },
+          "avgPrice": {
+            "type": "number",
+            "description": "Средняя цена в целом",
+            "format": "double"
+          },
+          "sumCount": {
+            "type": "integer",
+            "description": "Сумма по количеству штук",
+            "format": "int32"
+          },
+          "total": {
+            "type": "number",
+            "description": "Сумма по объему денег",
+            "format": "double"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          }
+        }
+      },
       "Trade": {
         "type": "object",
         "properties": {
@@ -301,6 +367,9 @@
   "tags": [
     {
       "name": "TradesApi"
+    },
+    {
+      "name": "StatisticsApi"
     },
     {
       "name": "BookmarksApi"

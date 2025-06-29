@@ -25,7 +25,7 @@
           <Button icon="pi pi-filter-slash" label="Clear" outlined type="button" @click="clearFilter()" />
         </div>
       </template>
-      <template #empty> No trades found.</template>
+      <template #empty> No data found.</template>
       <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
       <Column field="ticker" header="Ticker" sortable>
