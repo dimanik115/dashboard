@@ -4,15 +4,16 @@ namespace Dashboard.Services;
 
 public class StatisticsService(TradeService tradeService)
 {
+    /// <summary>Получить статистику</summary>
     public async Task<IEnumerable<Statistics>> GetAll()
     {
         var query = await tradeService.GetAll(new QueryParams());
         var result = query.GroupBy(x => x.Ticker).Select(x =>
             {
-                var sumCount = x.Where(t => t.BuySell == BuySell.B).Sum(t => t.Count) -
-                               x.Where(t => t.BuySell == BuySell.S).Sum(t => t.Count);
-                var total = x.Where(t => t.BuySell == BuySell.B).Sum(t => t.Sum) -
-                            x.Where(t => t.BuySell == BuySell.S).Sum(t => t.Sum);
+                var sumCount = x.Where(t => t.BuySell == BuySell.Buy).Sum(t => t.Count) -
+                               x.Where(t => t.BuySell == BuySell.Sell).Sum(t => t.Count);
+                var total = x.Where(t => t.BuySell == BuySell.Buy).Sum(t => t.Sum) -
+                            x.Where(t => t.BuySell == BuySell.Sell).Sum(t => t.Sum);
                 if (sumCount == 0) return null;
                 return new Statistics
                 {

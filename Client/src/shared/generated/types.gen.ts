@@ -2,36 +2,78 @@
 
 export type Bookmark = {
   id?: number;
+  /**
+   * Источник данных
+   */
   source?: string;
+  /**
+   * Тикер (символ)
+   */
   ticker?: string;
+  /**
+   * Мой тип для группировки
+   */
   type?: string;
+  /**
+   * Страна
+   */
+  country?: string;
+  /**
+   * Сектор (отрасль)
+   */
+  sector?: string;
+  /**
+   * Куплено ли
+   */
+  isBought?: boolean;
+  /**
+   * Описание
+   */
   description?: null | string;
 };
 
-export type Broker = 'Alpha' | 'Bcs' | 'T' | 'Sber' | 'Finam' | 'Vtb' | 'Cifra' | 'Mkb' | 'Gpb' | 'Mts';
+/**
+ * Брокер
+ */
+export type Broker = 'ALPHA' | 'BCS' | 'T' | 'SBER' | 'FINAM' | 'VTB' | 'CIFRA' | 'MKB' | 'GPB' | 'MTS';
 
+/**
+ * Брокер
+ */
 export const Broker = {
-  ALPHA: 'Alpha',
-  BCS: 'Bcs',
+  ALPHA: 'ALPHA',
+  BCS: 'BCS',
   T: 'T',
-  SBER: 'Sber',
-  FINAM: 'Finam',
-  VTB: 'Vtb',
-  CIFRA: 'Cifra',
-  MKB: 'Mkb',
-  GPB: 'Gpb',
-  MTS: 'Mts',
+  SBER: 'SBER',
+  FINAM: 'FINAM',
+  VTB: 'VTB',
+  CIFRA: 'CIFRA',
+  MKB: 'MKB',
+  GPB: 'GPB',
+  MTS: 'MTS',
 } as const;
 
-export type BuySell = 'B' | 'S';
+/**
+ * Покупка или продажа
+ */
+export type BuySell = 'Buy' | 'Sell';
 
+/**
+ * Покупка или продажа
+ */
 export const BuySell = {
-  B: 'B',
-  S: 'S',
+  BUY: 'Buy',
+  SELL: 'Sell',
 } as const;
 
+/**
+ * Валюта
+ */
 export type Currency = 'RUB' | 'USD' | 'EUR';
 
+/**
+ * Валюта
+ */
 export const Currency = {
   RUB: 'RUB',
   USD: 'USD',
@@ -142,11 +184,29 @@ export type Statistics = {
 };
 
 export type Trade = {
+  /**
+   * Id
+   */
   id?: number;
+  /**
+   * Тикер
+   */
   ticker?: string;
+  /**
+   * Дата сделки
+   */
   tradeDate?: string;
+  /**
+   * Средняя цена
+   */
   avgPrice?: number;
+  /**
+   * Кол-во штук
+   */
   count?: number;
+  /**
+   * Сумма по позиции
+   */
   sum?: number;
   currency?: Currency;
   buySell?: BuySell;

@@ -3,21 +3,100 @@
     <div class="up-data">
       <div class="my-field">
         <h3>
-          Всего вложено: <span v-if="isSuccess">{{ isHide ? 0 : formatCurrency(seedMoney!, 0) }}</span>
+          Всего вложено:
+          <span v-if="isSuccess">{{ isHide ? 0 : formatCurrency(seedMoney!, { maxFractionDigits: 0 }) }}</span>
         </h3>
         <h3>
-          Всего куплено: <span>{{ isHide ? 0 : formatCurrency(totalBuyed) }}</span>
+          Всего куплено: <span>{{ isHide ? 0 : formatCurrency(totalBought, { maxFractionDigits: 0 }) }}</span>
         </h3>
       </div>
       <div class="mini-table">
-        <DataTable :value="resultSum" removable-sort>
-          <Column field="country" header="country" sortable></Column>
-          <Column field="sum" header="sum" sortable>
-            <template #body="{ data }">
-              {{ isHide ? '*' : formatCurrency(data.sum) }}
-            </template>
-          </Column>
-        </DataTable>
+        <Tabs value="0">
+          <TabList>
+            <Tab value="0">По странам</Tab>
+            <Tab value="1">По секторам</Tab>
+            <Tab value="2">По типам активов</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel value="0">
+              <DataTable
+                :value="countryStat"
+                sort-field="sumRub"
+                :sort-order="-1"
+                removable-sort
+                paginator
+                :rows="5"
+                :alwaysShowPaginator="false"
+              >
+                <Column field="country" header="country"></Column>
+                <Column field="sum" header="sum">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sum, { currency: data.currency, maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
+                <Column field="sumRub" header="sumRub" sortable>
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sumRub, { maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
+                <Column field="percent" header="percent">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : ((data.sumRub / totalBought) * 100).toFixed(2) + '%' }}
+                  </template>
+                </Column>
+                <Column v-if="isLive && !isHide" header="now"> <template #body="{ data }"> now </template></Column>
+              </DataTable>
+            </TabPanel>
+            <TabPanel value="1">
+              <DataTable
+                :value="sectorStat"
+                sort-field="sumRub"
+                :sort-order="-1"
+                removable-sort
+                paginator
+                :rows="5"
+                :alwaysShowPaginator="false"
+              >
+                <Column field="sector" header="sector"></Column>
+                <Column field="sumRub" header="sumRub" sortable>
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sumRub, { maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
+                <Column field="percent" header="percent">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : ((data.sumRub / totalBought) * 100).toFixed(2) + '%' }}
+                  </template>
+                </Column>
+                <Column v-if="isLive && !isHide" header="now"> <template #body="{ data }"> now </template></Column>
+              </DataTable>
+            </TabPanel>
+            <TabPanel value="2">
+              <DataTable
+                :value="typeStat"
+                sort-field="sumRub"
+                :sort-order="-1"
+                removable-sort
+                paginator
+                :rows="5"
+                :alwaysShowPaginator="false"
+              >
+                <Column field="type" header="type"></Column>
+                <Column field="sumRub" header="sumRub" sortable>
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sumRub, { maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
+                <Column field="percent" header="percent">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : ((data.sumRub / totalBought) * 100).toFixed(2) + '%' }}
+                  </template>
+                </Column>
+                <Column v-if="isLive && !isHide" header="now"> <template #body="{ data }"> now </template></Column>
+              </DataTable>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </div>
     </div>
     <ToggleButton :onIcon="PrimeIcons.EYE" :offIcon="PrimeIcons.EYE_SLASH" v-model="isHide" onLabel="" offLabel="" />
@@ -52,7 +131,7 @@
       </Column>
       <Column field="avgPrice" header="AvgPrice" dataType="numeric" sortable>
         <template #body="{ data }">
-          {{ isHide ? '*' : formatCurrency(data.avgPrice) }}
+          {{ isHide ? '*' : formatCurrency(data.avgPrice, { currency: data.currency }) }}
         </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" currency="RUB" locale="ru-RU" mode="currency" />
@@ -65,7 +144,7 @@
       </Column>
       <Column field="total" header="total" dataType="numeric" sortable>
         <template #body="{ data }">
-          {{ isHide ? '*' : formatCurrency(data.total) }}
+          {{ isHide ? '*' : formatCurrency(data.total, { currency: data.currency }) }}
         </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" currency="RUB" locale="ru-RU" mode="currency" />
@@ -76,29 +155,33 @@
           <MultiSelect v-model="filterModel.value" :options="useCurrencyOptions()" placeholder="Any" />
         </template>
       </Column>
-      <Column v-if="isLive" header="now">
+      <Column v-if="isLive && !isHide" header="now">
         <template #body="{ data }">
-          <a :href="`https://www.tradingview.com/chart/?symbol=${data.source}:${data.ticker}`">ссылка на tradingview</a>
-        </template></Column
-      >
+          <a :href="`https://www.tradingview.com/chart/?symbol=${bookDict.get(data.ticker)!.source}:${data.ticker}`">
+            ссылка на tradingview
+          </a>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useBookmarks } from '@/shared/api/BookmarksApi';
 import { useStatistics } from '@/shared/api/StatisticsApi';
 import { useSeedMoney } from '@/shared/api/TradesApi.ts';
-import type { Currency } from '@/shared/generated';
+import type { Bookmark, Currency } from '@/shared/generated';
 import { useCurrencyOptions } from '@/shared/utils/enums';
 import { formatCurrency } from '@/shared/utils/num';
+import { useLocalStorage } from '@/shared/utils/useLocalStorage';
 import { FilterMatchMode, FilterOperator, PrimeIcons } from '@primevue/core/api';
 import type { DataTableFilterMeta } from 'primevue/datatable';
-import { computed, ref, shallowReactive } from 'vue';
+import { computed, ref } from 'vue';
 
 const isLive = ref(false);
 const pageSize = ref(10);
 const page = ref(0);
-const isHide = ref(false);
+const isHide = useLocalStorage('isHide', false);
 const filters = ref<DataTableFilterMeta>();
 const initFilters = () => {
   filters.value = {
@@ -140,26 +223,104 @@ const statistics = computed(() =>
         copy.sumCount = -1;
         copy.ticker = '*';
         copy.total = -1;
-        copy.currency = undefined;
+        copy.currency = 'RUB';
         return copy;
       }),
 );
-const template = computed(() => (!isHide.value ? '{first} to {last} of {totalRecords}' : '1'));
-const totalBuyed = computed(() => statistics.value?.reduce((sum, next) => sum + next.total!, 0) ?? 0);
-const resultSum = computed(() =>
-  statistics.value?.reduce(
-    (arr, next) => {
-      if (!arr.some((x) => x.country == next.currency)) {
-        arr.push({ country: next.currency, sum: next.total });
-      } else {
-        const first = arr.filter((x) => x.country == next.currency)[0];
-        first.sum += next.total;
-      }
-      return arr;
-    },
-    [] as { country: Currency; sum: number }[],
-  ),
+const template = computed(() => (!isHide.value ? '{first} to {last} of {totalRecords}' : '0'));
+const totalBought = computed(
+  () => statistics.value?.reduce((sum, next) => sum + IntoRub(next.total, next.currency), 0) ?? 1,
 );
+const { data: bookmarks } = useBookmarks();
+const bookDict = computed(() => {
+  const map = new Map<string, Bookmark>();
+  return (
+    bookmarks.value?.reduce((map, next) => {
+      map.set(next.ticker!, next);
+      return map;
+    }, map) ?? map
+  );
+});
+const countryStat = computed(() =>
+  !isHide.value
+    ? statistics.value?.reduce(
+        (arr, next) => {
+          const country = bookDict.value.get(next.ticker)!.country!;
+          if (!arr.some((x) => x.country == country)) {
+            arr.push({
+              country: country,
+              sum: next.total,
+              sumRub: IntoRub(next.total, next.currency),
+              currency: next.currency,
+            });
+          } else {
+            const first = arr.filter((x) => x.country == country)[0];
+            first.sum += next.total;
+            first.sumRub += IntoRub(next.total, next.currency);
+          }
+          return arr;
+        },
+        [] as { country: string; sum: number; sumRub: number; currency: Currency }[],
+      )
+    : [{ country: '*', sum: 0 }],
+);
+const sectorStat = computed(() =>
+  !isHide.value
+    ? statistics.value?.reduce(
+        (arr, next) => {
+          const sector = bookDict.value.get(next.ticker)!.sector!;
+          if (!arr.some((x) => x.sector == sector)) {
+            arr.push({
+              sector: sector,
+              sumRub: IntoRub(next.total, next.currency),
+              currency: next.currency,
+            });
+          } else {
+            const first = arr.filter((x) => x.sector == sector)[0];
+            first.sumRub += IntoRub(next.total, next.currency);
+          }
+          return arr;
+        },
+        [] as { sector: string; sumRub: number; currency: Currency }[],
+      )
+    : [{ sector: '*', sumRub: 0 }],
+);
+const typeStat = computed(() =>
+  !isHide.value
+    ? statistics.value?.reduce(
+        (arr, next) => {
+          const type = bookDict.value.get(next.ticker)!.type!;
+          if (!arr.some((x) => x.type == type)) {
+            arr.push({
+              type: type,
+              sumRub: IntoRub(next.total, next.currency),
+              currency: next.currency,
+            });
+          } else {
+            const first = arr.filter((x) => x.type == type)[0];
+            first.sumRub += IntoRub(next.total, next.currency);
+          }
+          return arr;
+        },
+        [] as { type: string; sumRub: number; currency: Currency }[],
+      )
+    : [{ type: '*', sumRub: 0 }],
+);
+function IntoRub(value: number, currency: Currency) {
+  let total: number;
+  switch (currency) {
+    case 'RUB':
+      total = value;
+      break;
+    case 'USD':
+      total = value * 74;
+      break;
+    case 'EUR':
+      total = value * 94;
+      break;
+  }
+  return total;
+}
 </script>
 
 <style scoped>

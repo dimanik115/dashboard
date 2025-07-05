@@ -128,48 +128,67 @@
             "format": "int32"
           },
           "source": {
-            "type": "string"
+            "type": "string",
+            "description": "Источник данных"
           },
           "ticker": {
-            "type": "string"
+            "type": "string",
+            "description": "Тикер (символ)"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "Мой тип для группировки"
+          },
+          "country": {
+            "type": "string",
+            "description": "Страна"
+          },
+          "sector": {
+            "type": "string",
+            "description": "Сектор (отрасль)"
+          },
+          "isBought": {
+            "type": "boolean",
+            "description": "Куплено ли"
           },
           "description": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Описание"
           }
         }
       },
       "Broker": {
         "enum": [
-          "Alpha",
-          "Bcs",
+          "ALPHA",
+          "BCS",
           "T",
-          "Sber",
-          "Finam",
-          "Vtb",
-          "Cifra",
-          "Mkb",
-          "Gpb",
-          "Mts"
-        ]
+          "SBER",
+          "FINAM",
+          "VTB",
+          "CIFRA",
+          "MKB",
+          "GPB",
+          "MTS"
+        ],
+        "description": "Брокер"
       },
       "BuySell": {
         "enum": [
-          "B",
-          "S"
-        ]
+          "Buy",
+          "Sell"
+        ],
+        "description": "Покупка или продажа"
       },
       "Currency": {
         "enum": [
           "RUB",
           "USD",
           "EUR"
-        ]
+        ],
+        "description": "Валюта"
       },
       "Filter": {
         "required": [
@@ -330,25 +349,31 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Id",
             "format": "int32"
           },
           "ticker": {
-            "type": "string"
+            "type": "string",
+            "description": "Тикер"
           },
           "tradeDate": {
             "type": "string",
+            "description": "Дата сделки",
             "format": "date-time"
           },
           "avgPrice": {
             "type": "number",
+            "description": "Средняя цена",
             "format": "double"
           },
           "count": {
             "type": "integer",
+            "description": "Кол-во штук",
             "format": "int32"
           },
           "sum": {
             "type": "number",
+            "description": "Сумма по позиции",
             "format": "double"
           },
           "currency": {

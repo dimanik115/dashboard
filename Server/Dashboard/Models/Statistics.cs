@@ -17,5 +17,6 @@ public class Statistics
     /// <summary>Сумма по объему денег</summary>
     public required decimal Total { get; set; }
 
+    /// <summary>Валюта</summary>
     public required Currency Currency { get; set; }
 }

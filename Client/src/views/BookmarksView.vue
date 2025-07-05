@@ -54,7 +54,10 @@ import { useBookmarks } from '@/shared/api/BookmarksApi';
 const isShow = ref(false);
 const columns = [
   { field: 'source', header: 'Source', sortable: true },
-  { field: 'ticker', header: 'ticker', sortable: true },
+  { field: 'ticker', header: 'Ticker', sortable: true },
+  { field: 'country', header: 'country', sortable: true },
+  { field: 'sector', header: 'sector', sortable: true },
+  { field: 'isBought', header: 'isBought', sortable: true },
   { field: 'description', header: 'description', sortable: true },
 ];
 const expandedRowGroups = ref();

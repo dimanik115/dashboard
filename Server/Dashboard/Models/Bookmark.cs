@@ -7,11 +7,24 @@ public class Bookmark
     [ExcelIgnore]
     public int Id { get; set; }
 
+    /// <summary>Источник данных</summary>
     public string Source { get; set; } = null!;
 
+    /// <summary>Тикер (символ)</summary>
     public string Ticker { get; set; } = null!;
 
+    /// <summary>Мой тип для группировки</summary>
     public string Type { get; set; } = null!;
 
+    /// <summary>Страна</summary>
+    public string Country { get; set; } = null!;
+
+    /// <summary>Сектор (отрасль)</summary>
+    public string Sector { get; set; } = null!;
+
+    /// <summary>Куплено ли</summary>
+    public bool IsBought { get; set; }
+
+    /// <summary>Описание</summary>
     public string? Description { get; set; }
 }

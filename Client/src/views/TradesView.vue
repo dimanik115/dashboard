@@ -1,11 +1,6 @@
 <template>
-  <div :class="{ 'all-hide': isToggled }">
-    <ToggleButton v-model="isToggled" onLabel="Раскрыть" offLabel="Скрыть" />
-    <div class="my-field">
-      <h3>
-        Вложено: <span :class="{ 'my-hide': isToggled }" v-if="isSuccess">{{ formatCurrency(seedMoney!, 0) }}</span>
-      </h3>
-    </div>
+  <div>
+    <ToggleButton :onIcon="PrimeIcons.EYE" :offIcon="PrimeIcons.EYE_SLASH" v-model="isHide" onLabel="" offLabel="" />
     <DataTable
       v-model:filters="filters"
       v-model:selection="selected"
@@ -50,7 +45,7 @@
       </Column>
       <Column field="avgPrice" header="AvgPrice" dataType="numeric" sortable>
         <template #body="{ data }">
-          {{ formatCurrency(data.avgPrice) }}
+          {{ isHide ? '*' : formatCurrency(data.avgPrice) }}
         </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" currency="RUB" locale="ru-RU" mode="currency" />
@@ -63,7 +58,7 @@
       </Column>
       <Column field="sum" header="Sum" dataType="numeric" sortable>
         <template #body="{ data }">
-          {{ formatCurrency(data.sum) }}
+          {{ isHide ? '*' : formatCurrency(data.sum) }}
         </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" currency="RUB" locale="ru-RU" mode="currency" />
@@ -89,15 +84,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
-import type { DataTableFilterMeta } from 'primevue/datatable';
-import { useSeedMoney, useTrades } from '@/shared/api/TradesApi.ts';
+import { useTrades } from '@/shared/api/TradesApi.ts';
 import { formatDate } from '@/shared/utils/date';
-import { formatCurrency } from '@/shared/utils/num';
 import { useBrokerOptions, useBuySellOptions, useCurrencyOptions } from '@/shared/utils/enums';
+import { formatCurrency } from '@/shared/utils/num';
+import { FilterMatchMode, FilterOperator, PrimeIcons } from '@primevue/core/api';
+import type { DataTableFilterMeta } from 'primevue/datatable';
+import { computed, ref } from 'vue';
+import { useLocalStorage } from '@/shared/utils/useLocalStorage';
 
-const isToggled = ref(false);
+const isHide = useLocalStorage('isHide', false);
 const filters = ref<DataTableFilterMeta>();
 const initFilters = () => {
   filters.value = {
@@ -131,11 +127,23 @@ const clearFilter = () => {
 };
 
 initFilters();
-const { data: seedMoney, isSuccess } = useSeedMoney();
 const selected = ref();
-const { data, isLoading } = useTrades({});
+const { data } = useTrades({});
 const trades = computed(() =>
-  !isLoading.value ? data.value!.map((x) => ({ ...x, tradeDate: new Date(x.tradeDate!) })) : [],
+  !isHide.value
+    ? data.value?.map((x) => ({ ...x, tradeDate: new Date(x.tradeDate!) }))
+    : data.value?.map((x) => {
+        const copy = structuredClone({ ...x });
+        copy.avgPrice = -1;
+        copy.count = -1;
+        copy.sum = -1;
+        copy.tradeDate = '*';
+        copy.ticker = '*';
+        copy.broker = undefined;
+        copy.currency = 'RUB';
+        copy.buySell = undefined;
+        return copy;
+      }),
 );
 </script>
 

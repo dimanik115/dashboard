@@ -26,7 +26,11 @@ declare module 'vue' {
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Tab: typeof import('primevue/tab')['default']
+    TabList: typeof import('primevue/tablist')['default']
+    TabPanel: typeof import('primevue/tabpanel')['default']
+    TabPanels: typeof import('primevue/tabpanels')['default']
+    Tabs: typeof import('primevue/tabs')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
-    ToggleSwitch: typeof import('primevue/toggleswitch')['default']
   }
 }
