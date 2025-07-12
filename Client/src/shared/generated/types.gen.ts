@@ -11,7 +11,11 @@ export type Bookmark = {
    */
   ticker?: string;
   /**
-   * Мой тип для группировки
+   * Поле для группировки
+   */
+  group?: string;
+  /**
+   * Тип актива
    */
   type?: string;
   /**
@@ -30,6 +34,10 @@ export type Bookmark = {
    * Описание
    */
   description?: null | string;
+  /**
+   * Описание
+   */
+  tinkUid?: null | string;
 };
 
 /**
@@ -66,10 +74,38 @@ export const BuySell = {
   SELL: 'Sell',
 } as const;
 
+export type CountryStatistics = {
+  /**
+   * Id
+   */
+  id: number;
+  /**
+   * Страна
+   */
+  country: string;
+  /**
+   * Сумма по объему денег
+   */
+  sum: number;
+  currency: Currency;
+  /**
+   * Сумма по объему денег в рублях
+   */
+  sumRub: number;
+  /**
+   * Процент от всей суммы
+   */
+  percent: number;
+  /**
+   * Сумма по объему денег в рублях на сейчас
+   */
+  sumRubNow?: number;
+};
+
 /**
  * Валюта
  */
-export type Currency = 'RUB' | 'USD' | 'EUR';
+export type Currency = 'RUB' | 'USD' | 'EUR' | 'HKD' | 'CNY' | 'AED';
 
 /**
  * Валюта
@@ -78,7 +114,22 @@ export const Currency = {
   RUB: 'RUB',
   USD: 'USD',
   EUR: 'EUR',
+  HKD: 'HKD',
+  CNY: 'CNY',
+  AED: 'AED',
 } as const;
+
+export type CurrencyAvgPrice = {
+  currency?: Currency;
+  /**
+   * Средний курс покупки
+   */
+  avgPrice?: number;
+  /**
+   * Средний курс покупки на сейчас
+   */
+  avgPriceNow?: number;
+};
 
 /**
  * Фильтр
@@ -138,6 +189,29 @@ export type QueryParams = {
   pageSize?: null | number;
 };
 
+export type SectorStatistics = {
+  /**
+   * Id
+   */
+  id: number;
+  /**
+   * Сектор
+   */
+  sector: string;
+  /**
+   * Сумма по объему денег в рублях
+   */
+  sumRub: number;
+  /**
+   * Процент от всей суммы
+   */
+  percent: number;
+  /**
+   * Сумма по объему денег в рублях на сейчас
+   */
+  sumRubNow?: number;
+};
+
 /**
  * модель сортировки
  */
@@ -163,24 +237,48 @@ export type Statistics = {
   /**
    * Id
    */
-  id: number;
+  id?: number;
   /**
    * Тикер
    */
-  ticker: string;
+  ticker?: string;
   /**
    * Средняя цена в целом
    */
-  avgPrice: number;
+  avgPrice?: number;
   /**
-   * Сумма по количеству штук
+   * Сумма по количеству штук инструментов
    */
-  sumCount: number;
+  sumCount?: number;
   /**
    * Сумма по объему денег
    */
-  total: number;
-  currency: Currency;
+  total?: number;
+  /**
+   * Доля от общего
+   */
+  percent?: number;
+  currency?: Currency;
+  /**
+   * Страна
+   */
+  country?: string;
+  /**
+   * Сектор (отрасль)
+   */
+  sector?: string;
+  /**
+   * Тип актива
+   */
+  type?: string;
+  /**
+   * Источник данных
+   */
+  source?: string;
+  /**
+   * Сумма по объему денег в рублях на сейчас
+   */
+  sumRubNow?: number;
 };
 
 export type Trade = {
@@ -188,6 +286,10 @@ export type Trade = {
    * Id
    */
   id?: number;
+  /**
+   * Биржа
+   */
+  exchange?: string;
   /**
    * Тикер
    */
@@ -211,6 +313,29 @@ export type Trade = {
   currency?: Currency;
   buySell?: BuySell;
   broker?: Broker;
+};
+
+export type TypeStatistics = {
+  /**
+   * Id
+   */
+  id: number;
+  /**
+   * Тип активов
+   */
+  type: string;
+  /**
+   * Сумма по объему денег в рублях
+   */
+  sumRub: number;
+  /**
+   * Процент от всей суммы
+   */
+  percent: number;
+  /**
+   * Сумма по объему денег в рублях на сейчас
+   */
+  sumRubNow?: number;
 };
 
 export type PostApiV1TradesListData = {
@@ -263,7 +388,9 @@ export type GetApiV1TradesGetseedmoneyResponse =
 export type GetApiV1StatisticsListData = {
   body?: never;
   path?: never;
-  query?: never;
+  query: {
+    IsOnline: boolean;
+  };
   url: '/api/v1/statistics/list';
 };
 
@@ -282,6 +409,110 @@ export type GetApiV1StatisticsListResponses = {
 };
 
 export type GetApiV1StatisticsListResponse = GetApiV1StatisticsListResponses[keyof GetApiV1StatisticsListResponses];
+
+export type GetApiV1StatisticsByCountryData = {
+  body?: never;
+  path?: never;
+  query: {
+    IsOnline: boolean;
+  };
+  url: '/api/v1/statistics/byCountry';
+};
+
+export type GetApiV1StatisticsByCountryErrors = {
+  /**
+   * Bad Request
+   */
+  400: unknown;
+};
+
+export type GetApiV1StatisticsByCountryResponses = {
+  /**
+   * OK
+   */
+  200: Array<CountryStatistics>;
+};
+
+export type GetApiV1StatisticsByCountryResponse =
+  GetApiV1StatisticsByCountryResponses[keyof GetApiV1StatisticsByCountryResponses];
+
+export type GetApiV1StatisticsBySectorData = {
+  body?: never;
+  path?: never;
+  query: {
+    IsOnline: boolean;
+  };
+  url: '/api/v1/statistics/bySector';
+};
+
+export type GetApiV1StatisticsBySectorErrors = {
+  /**
+   * Bad Request
+   */
+  400: unknown;
+};
+
+export type GetApiV1StatisticsBySectorResponses = {
+  /**
+   * OK
+   */
+  200: Array<SectorStatistics>;
+};
+
+export type GetApiV1StatisticsBySectorResponse =
+  GetApiV1StatisticsBySectorResponses[keyof GetApiV1StatisticsBySectorResponses];
+
+export type GetApiV1StatisticsByTypeData = {
+  body?: never;
+  path?: never;
+  query: {
+    IsOnline: boolean;
+  };
+  url: '/api/v1/statistics/byType';
+};
+
+export type GetApiV1StatisticsByTypeErrors = {
+  /**
+   * Bad Request
+   */
+  400: unknown;
+};
+
+export type GetApiV1StatisticsByTypeResponses = {
+  /**
+   * OK
+   */
+  200: Array<TypeStatistics>;
+};
+
+export type GetApiV1StatisticsByTypeResponse =
+  GetApiV1StatisticsByTypeResponses[keyof GetApiV1StatisticsByTypeResponses];
+
+export type GetApiV1StatisticsTotalMoneyData = {
+  body?: never;
+  path?: never;
+  query: {
+    IsOnline: boolean;
+  };
+  url: '/api/v1/statistics/totalMoney';
+};
+
+export type GetApiV1StatisticsTotalMoneyErrors = {
+  /**
+   * Bad Request
+   */
+  400: unknown;
+};
+
+export type GetApiV1StatisticsTotalMoneyResponses = {
+  /**
+   * OK
+   */
+  200: number;
+};
+
+export type GetApiV1StatisticsTotalMoneyResponse =
+  GetApiV1StatisticsTotalMoneyResponses[keyof GetApiV1StatisticsTotalMoneyResponses];
 
 export type GetApiV1BookmarksListData = {
   body?: never;
@@ -305,6 +536,32 @@ export type GetApiV1BookmarksListResponses = {
 };
 
 export type GetApiV1BookmarksListResponse = GetApiV1BookmarksListResponses[keyof GetApiV1BookmarksListResponses];
+
+export type GetApiV1CurrencyAvgPricesData = {
+  body?: never;
+  path?: never;
+  query: {
+    IsOnline: boolean;
+  };
+  url: '/api/v1/currency/avgPrices';
+};
+
+export type GetApiV1CurrencyAvgPricesErrors = {
+  /**
+   * Bad Request
+   */
+  400: unknown;
+};
+
+export type GetApiV1CurrencyAvgPricesResponses = {
+  /**
+   * OK
+   */
+  200: Array<CurrencyAvgPrice>;
+};
+
+export type GetApiV1CurrencyAvgPricesResponse =
+  GetApiV1CurrencyAvgPricesResponses[keyof GetApiV1CurrencyAvgPricesResponses];
 
 export type ClientOptions = {
   baseUrl: `${string}://${string}` | (string & {});

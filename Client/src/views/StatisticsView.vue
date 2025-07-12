@@ -1,16 +1,46 @@
 <template>
   <div>
-    <div class="up-data">
+    <div class="top-data">
       <div class="my-field">
         <h3>
           Всего вложено:
-          <span v-if="isSuccess">{{ isHide ? 0 : formatCurrency(seedMoney!, { maxFractionDigits: 0 }) }}</span>
+          <span v-if="isSuccessSeedMoney">
+            {{ isHide ? 0 : formatCurrency(seedMoney!, { maxFractionDigits: 0 }) }}
+          </span>
         </h3>
         <h3>
-          Всего куплено: <span>{{ isHide ? 0 : formatCurrency(totalBought, { maxFractionDigits: 0 }) }}</span>
+          Всего куплено:
+          <span v-if="isSuccessTotalMoney">
+            {{ isHide ? 0 : formatCurrency(totalMoney!, { maxFractionDigits: 0 }) }}
+          </span>
         </h3>
+        <h3 v-if="isLive">
+          Всего на сейчас:
+          <span v-if="isSuccessTotalMoneyNow">
+            {{ isHide ? 0 : formatCurrency(totalMoneyNow!, { maxFractionDigits: 0 }) }}
+          </span>
+        </h3>
+        <div class="currency-table">
+          <DataTable :value="avgPrices">
+            <Column field="currency" header="currency">
+              <template #body="{ data }">
+                {{ isHide ? '*' : data.currency }}
+              </template>
+            </Column>
+            <Column field="avgPrice" header="avgPrice">
+              <template #body="{ data }">
+                {{ isHide ? '*' : formatCurrency(data.avgPrice, { currency: data.currency }) }}
+              </template>
+            </Column>
+            <Column v-if="isLive && !isHide" field="avgPriceNow" header="avgPriceNow">
+              <template #body="{ data }">
+                {{ isHide ? '*' : formatCurrency(data.avgPriceNow, { currency: data.currency }) }}
+              </template>
+            </Column>
+          </DataTable>
+        </div>
       </div>
-      <div class="mini-table">
+      <div class="ministat-table">
         <Tabs value="0">
           <TabList>
             <Tab value="0">По странам</Tab>
@@ -26,9 +56,12 @@
                 removable-sort
                 paginator
                 :rows="5"
-                :alwaysShowPaginator="false"
-              >
-                <Column field="country" header="country"></Column>
+                :alwaysShowPaginator="false">
+                <Column field="country" header="country">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : data.country }}
+                  </template>
+                </Column>
                 <Column field="sum" header="sum">
                   <template #body="{ data }">
                     {{ isHide ? '*' : formatCurrency(data.sum, { currency: data.currency, maxFractionDigits: 0 }) }}
@@ -41,10 +74,14 @@
                 </Column>
                 <Column field="percent" header="percent">
                   <template #body="{ data }">
-                    {{ isHide ? '*' : ((data.sumRub / totalBought) * 100).toFixed(2) + '%' }}
+                    {{ isHide ? '*' : data.percent + '%' }}
                   </template>
                 </Column>
-                <Column v-if="isLive && !isHide" header="now"> <template #body="{ data }"> now </template></Column>
+                <Column v-if="isLive && !isHide" header="sumRubNow">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sumRubNow, { maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
               </DataTable>
             </TabPanel>
             <TabPanel value="1">
@@ -55,9 +92,12 @@
                 removable-sort
                 paginator
                 :rows="5"
-                :alwaysShowPaginator="false"
-              >
-                <Column field="sector" header="sector"></Column>
+                :alwaysShowPaginator="false">
+                <Column field="sector" header="sector">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : data.sector }}
+                  </template>
+                </Column>
                 <Column field="sumRub" header="sumRub" sortable>
                   <template #body="{ data }">
                     {{ isHide ? '*' : formatCurrency(data.sumRub, { maxFractionDigits: 0 }) }}
@@ -65,10 +105,14 @@
                 </Column>
                 <Column field="percent" header="percent">
                   <template #body="{ data }">
-                    {{ isHide ? '*' : ((data.sumRub / totalBought) * 100).toFixed(2) + '%' }}
+                    {{ isHide ? '*' : data.percent + '%' }}
                   </template>
                 </Column>
-                <Column v-if="isLive && !isHide" header="now"> <template #body="{ data }"> now </template></Column>
+                <Column v-if="isLive && !isHide" header="sumRubNow">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sumRubNow, { maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
               </DataTable>
             </TabPanel>
             <TabPanel value="2">
@@ -79,9 +123,12 @@
                 removable-sort
                 paginator
                 :rows="5"
-                :alwaysShowPaginator="false"
-              >
-                <Column field="type" header="type"></Column>
+                :alwaysShowPaginator="false">
+                <Column field="type" header="type">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : data.type }}
+                  </template>
+                </Column>
                 <Column field="sumRub" header="sumRub" sortable>
                   <template #body="{ data }">
                     {{ isHide ? '*' : formatCurrency(data.sumRub, { maxFractionDigits: 0 }) }}
@@ -89,10 +136,14 @@
                 </Column>
                 <Column field="percent" header="percent">
                   <template #body="{ data }">
-                    {{ isHide ? '*' : ((data.sumRub / totalBought) * 100).toFixed(2) + '%' }}
+                    {{ isHide ? '*' : data.percent + '%' }}
                   </template>
                 </Column>
-                <Column v-if="isLive && !isHide" header="now"> <template #body="{ data }"> now </template></Column>
+                <Column v-if="isLive && !isHide" header="sumRubNow">
+                  <template #body="{ data }">
+                    {{ isHide ? '*' : formatCurrency(data.sumRubNow, { maxFractionDigits: 0 }) }}
+                  </template>
+                </Column>
               </DataTable>
             </TabPanel>
           </TabPanels>
@@ -100,7 +151,13 @@
       </div>
     </div>
     <ToggleButton :onIcon="PrimeIcons.EYE" :offIcon="PrimeIcons.EYE_SLASH" v-model="isHide" onLabel="" offLabel="" />
-    <ToggleButton :onIcon="PrimeIcons.STOP" :offIcon="PrimeIcons.SYNC" v-model="isLive" onLabel="" offLabel="" />
+    <ToggleButton
+      :onIcon="PrimeIcons.STOP"
+      :offIcon="PrimeIcons.SYNC"
+      v-model="isLive"
+      onLabel=""
+      offLabel=""
+      @update:model-value="onSync" />
     <DataTable
       v-model:filters="filters"
       v-model:selection="selected"
@@ -115,14 +172,14 @@
       paginator
       removableSort
       stripedRows
-    >
+      @rowSelect="onRowSelect"
+      selectionMode="single">
       <template #header>
         <div class="">
           <Button icon="pi pi-filter-slash" label="Clear" outlined type="button" @click="clearFilter()" />
         </div>
       </template>
-      <template #empty> No data found.</template>
-      <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
+      <template #empty>No data found.</template>
 
       <Column field="ticker" header="Ticker" sortable>
         <template #filter="{ filterModel }">
@@ -150,34 +207,77 @@
           <InputNumber v-model="filterModel.value" currency="RUB" locale="ru-RU" mode="currency" />
         </template>
       </Column>
+      <Column field="percent" header="percent" dataType="numeric" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.percent + '%' }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputNumber v-model="filterModel.value" currency="RUB" locale="ru-RU" mode="currency" />
+        </template>
+      </Column>
       <Column field="currency" header="Currency" :showFilterMatchModes="false" sortable>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="useCurrencyOptions()" placeholder="Any" />
         </template>
       </Column>
-      <Column v-if="isLive && !isHide" header="now">
+      <Column field="country" header="Country" :showFilterMatchModes="false" sortable>
+        <template #filter="{ filterModel }">
+          <MultiSelect v-model="filterModel.value" :options="countryStat?.map((x) => x.country)" placeholder="Any" />
+        </template>
+      </Column>
+      <Column field="sector" header="Sector" :showFilterMatchModes="false" sortable>
+        <template #filter="{ filterModel }">
+          <MultiSelect v-model="filterModel.value" :options="sectorStat?.map((x) => x.sector)" placeholder="Any" />
+        </template>
+      </Column>
+      <Column field="type" header="Type" :showFilterMatchModes="false" sortable>
+        <template #filter="{ filterModel }">
+          <MultiSelect v-model="filterModel.value" :options="typeStat?.map((x) => x.type)" placeholder="Any" />
+        </template>
+      </Column>
+      <Column v-if="isLive && !isHide" field="sumRubNow" header="sumRubNow">
         <template #body="{ data }">
-          <a :href="`https://www.tradingview.com/chart/?symbol=${bookDict.get(data.ticker)!.source}:${data.ticker}`">
-            ссылка на tradingview
-          </a>
+          {{ isHide ? '*' : formatCurrency(data.sumRubNow, { maxFractionDigits: 0 }) }}
+        </template>
+      </Column>
+      <Column v-if="isLive && !isHide" field="avgNow" header="avgNow">
+        <template #body="{ data }">
+          {{ isHide ? '*' : formatCurrency(data.sumRubNow / data.sumCount, { maxFractionDigits: 0 }) }}
         </template>
       </Column>
     </DataTable>
+    <!-- <TD v-if="isLive" :search="search"></TD> -->
+    <div style="font-size: xx-large; display: flex; justify-content: center; padding-top: 50px">
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        :href="`https://www.tradingview.com/chart/?symbol=${search}`"
+        style="">
+        ссылка на tradingview
+      </a>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useBookmarks } from '@/shared/api/BookmarksApi';
-import { useStatistics } from '@/shared/api/StatisticsApi';
+import { useAvgPrices } from '@/shared/api/CurrencyApi';
+import {
+  useStatistics,
+  useStatisticsByCountry,
+  useStatisticsBySector,
+  useStatisticsByType,
+  useTotalMoney,
+} from '@/shared/api/StatisticsApi';
 import { useSeedMoney } from '@/shared/api/TradesApi.ts';
-import type { Bookmark, Currency } from '@/shared/generated';
+import type { Bookmark, Statistics } from '@/shared/generated';
 import { useCurrencyOptions } from '@/shared/utils/enums';
 import { formatCurrency } from '@/shared/utils/num';
 import { useLocalStorage } from '@/shared/utils/useLocalStorage';
 import { FilterMatchMode, FilterOperator, PrimeIcons } from '@primevue/core/api';
-import type { DataTableFilterMeta } from 'primevue/datatable';
+import type { DataTableFilterMeta, DataTableRowSelectEvent } from 'primevue/datatable';
 import { computed, ref } from 'vue';
 
+const search = ref('RUS:SIBN');
 const isLive = ref(false);
 const pageSize = ref(10);
 const page = ref(0);
@@ -202,6 +302,9 @@ const initFilters = () => {
       constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
     },
     currency: { value: null, matchMode: FilterMatchMode.IN },
+    country: { value: null, matchMode: FilterMatchMode.IN },
+    sector: { value: null, matchMode: FilterMatchMode.IN },
+    type: { value: null, matchMode: FilterMatchMode.IN },
   };
   pageSize.value = 10;
   page.value = 0;
@@ -211,9 +314,12 @@ const clearFilter = () => {
 };
 
 initFilters();
-const { data: seedMoney, isSuccess } = useSeedMoney();
+const { data: seedMoney, isSuccess: isSuccessSeedMoney } = useSeedMoney();
+const { data: totalMoney, isSuccess: isSuccessTotalMoney } = useTotalMoney(false);
+const { data: totalMoneyNow, isSuccess: isSuccessTotalMoneyNow } = useTotalMoney(isLive);
+
 const selected = ref();
-const { data } = useStatistics();
+const { data } = useStatistics(isLive);
 const statistics = computed(() =>
   !isHide.value
     ? data.value
@@ -224,116 +330,44 @@ const statistics = computed(() =>
         copy.ticker = '*';
         copy.total = -1;
         copy.currency = 'RUB';
+        copy.country = '';
+        copy.sector = '';
+        copy.type = '';
         return copy;
       }),
 );
 const template = computed(() => (!isHide.value ? '{first} to {last} of {totalRecords}' : '0'));
-const totalBought = computed(
-  () => statistics.value?.reduce((sum, next) => sum + IntoRub(next.total, next.currency), 0) ?? 1,
-);
-const { data: bookmarks } = useBookmarks();
-const bookDict = computed(() => {
-  const map = new Map<string, Bookmark>();
-  return (
-    bookmarks.value?.reduce((map, next) => {
-      map.set(next.ticker!, next);
-      return map;
-    }, map) ?? map
-  );
-});
-const countryStat = computed(() =>
-  !isHide.value
-    ? statistics.value?.reduce(
-        (arr, next) => {
-          const country = bookDict.value.get(next.ticker)!.country!;
-          if (!arr.some((x) => x.country == country)) {
-            arr.push({
-              country: country,
-              sum: next.total,
-              sumRub: IntoRub(next.total, next.currency),
-              currency: next.currency,
-            });
-          } else {
-            const first = arr.filter((x) => x.country == country)[0];
-            first.sum += next.total;
-            first.sumRub += IntoRub(next.total, next.currency);
-          }
-          return arr;
-        },
-        [] as { country: string; sum: number; sumRub: number; currency: Currency }[],
-      )
-    : [{ country: '*', sum: 0 }],
-);
-const sectorStat = computed(() =>
-  !isHide.value
-    ? statistics.value?.reduce(
-        (arr, next) => {
-          const sector = bookDict.value.get(next.ticker)!.sector!;
-          if (!arr.some((x) => x.sector == sector)) {
-            arr.push({
-              sector: sector,
-              sumRub: IntoRub(next.total, next.currency),
-              currency: next.currency,
-            });
-          } else {
-            const first = arr.filter((x) => x.sector == sector)[0];
-            first.sumRub += IntoRub(next.total, next.currency);
-          }
-          return arr;
-        },
-        [] as { sector: string; sumRub: number; currency: Currency }[],
-      )
-    : [{ sector: '*', sumRub: 0 }],
-);
-const typeStat = computed(() =>
-  !isHide.value
-    ? statistics.value?.reduce(
-        (arr, next) => {
-          const type = bookDict.value.get(next.ticker)!.type!;
-          if (!arr.some((x) => x.type == type)) {
-            arr.push({
-              type: type,
-              sumRub: IntoRub(next.total, next.currency),
-              currency: next.currency,
-            });
-          } else {
-            const first = arr.filter((x) => x.type == type)[0];
-            first.sumRub += IntoRub(next.total, next.currency);
-          }
-          return arr;
-        },
-        [] as { type: string; sumRub: number; currency: Currency }[],
-      )
-    : [{ type: '*', sumRub: 0 }],
-);
-function IntoRub(value: number, currency: Currency) {
-  let total: number;
-  switch (currency) {
-    case 'RUB':
-      total = value;
-      break;
-    case 'USD':
-      total = value * 74;
-      break;
-    case 'EUR':
-      total = value * 94;
-      break;
+const { data: countryStat } = useStatisticsByCountry(isLive);
+const { data: sectorStat } = useStatisticsBySector(isLive);
+const { data: typeStat } = useStatisticsByType(isLive);
+const { data: avgPrices } = useAvgPrices(isLive);
+function onSync(bool: boolean) {
+  if (bool) {
+    // TODO get online prices
   }
-  return total;
+}
+function onRowSelect(event: DataTableRowSelectEvent<Statistics>) {
+  search.value = event.data.source + ':' + event.data.ticker;
 }
 </script>
 
 <style scoped>
 .my-field {
-  width: 400px;
+  width: 500px;
   padding-bottom: 40px;
   padding-right: 100px;
   color: hsla(160, 100%, 37%, 1);
 }
-.up-data {
+
+.top-data {
   display: flex;
 }
-.mini-table {
+
+.ministat-table {
   font-size: large;
+}
+
+.currency-table {
+  padding-top: 15px;
 }
 </style>

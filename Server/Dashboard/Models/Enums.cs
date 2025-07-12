@@ -33,5 +33,8 @@ public enum Currency
 {
     RUB,
     USD,
-    EUR
+    EUR,
+    HKD,
+    CNY,
+    AED
 }

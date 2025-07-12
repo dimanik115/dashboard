@@ -6,6 +6,8 @@
       v-model:selection="selected"
       :rows="10"
       :rowsPerPageOptions="[5, 10, 20, 50]"
+      paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+      v-model:currentPageReportTemplate="template"
       :value="trades"
       dataKey="id"
       filterDisplay="menu"
@@ -93,6 +95,7 @@ import type { DataTableFilterMeta } from 'primevue/datatable';
 import { computed, ref } from 'vue';
 import { useLocalStorage } from '@/shared/utils/useLocalStorage';
 
+const template = computed(() => (!isHide.value ? '{first} to {last} of {totalRecords}' : '0'));
 const isHide = useLocalStorage('isHide', false);
 const filters = ref<DataTableFilterMeta>();
 const initFilters = () => {

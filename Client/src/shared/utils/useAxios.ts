@@ -8,7 +8,6 @@ export const useAxios = (path: string = 'api/v1/') => {
   const baseURL = useConfiguration().urls.api;
   const instance = axios.create({
     baseURL: baseURL + path,
-    timeout: 10_000,
     headers: { 'X-Custom-Header': 'foobar' },
   });
   axios.interceptors.request.use((config) => {
@@ -17,3 +16,12 @@ export const useAxios = (path: string = 'api/v1/') => {
   });
   return instance;
 };
+
+export function useTinkAxios() {
+  const baseURL = 'https://sandbox-invest-public-api.tinkoff.ru:443';
+  const instance = axios.create({
+    baseURL: baseURL,
+    headers: { Authorization: 'Bearer ' + import.meta.env.VITE_TOKEN },
+  });
+  return instance;
+}

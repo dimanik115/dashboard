@@ -71,6 +71,16 @@
           "StatisticsApi"
         ],
         "summary": "Получить статистику",
+        "parameters": [
+          {
+            "name": "IsOnline",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -81,6 +91,148 @@
                   "items": {
                     "$ref": "#/components/schemas/Statistics"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/statistics/byCountry": {
+      "get": {
+        "tags": [
+          "StatisticsApi"
+        ],
+        "summary": "Получить статистику по странам",
+        "parameters": [
+          {
+            "name": "IsOnline",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountryStatistics"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/statistics/bySector": {
+      "get": {
+        "tags": [
+          "StatisticsApi"
+        ],
+        "summary": "Получить статистику по секторам",
+        "parameters": [
+          {
+            "name": "IsOnline",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SectorStatistics"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/statistics/byType": {
+      "get": {
+        "tags": [
+          "StatisticsApi"
+        ],
+        "summary": "Получить статистику по типу активов",
+        "parameters": [
+          {
+            "name": "IsOnline",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TypeStatistics"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/statistics/totalMoney": {
+      "get": {
+        "tags": [
+          "StatisticsApi"
+        ],
+        "summary": "Получить количество денег по всем активам",
+        "parameters": [
+          {
+            "name": "IsOnline",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "format": "double"
                 }
               }
             }
@@ -116,6 +268,42 @@
           }
         }
       }
+    },
+    "/api/v1/currency/avgPrices": {
+      "get": {
+        "tags": [
+          "CurrencyApi"
+        ],
+        "summary": "Получить все средние курсы валют",
+        "parameters": [
+          {
+            "name": "IsOnline",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CurrencyAvgPrice"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -135,9 +323,13 @@
             "type": "string",
             "description": "Тикер (символ)"
           },
+          "group": {
+            "type": "string",
+            "description": "Поле для группировки"
+          },
           "type": {
             "type": "string",
-            "description": "Мой тип для группировки"
+            "description": "Тип актива"
           },
           "country": {
             "type": "string",
@@ -152,6 +344,13 @@
             "description": "Куплено ли"
           },
           "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Описание"
+          },
+          "tinkUid": {
             "type": [
               "null",
               "string"
@@ -182,13 +381,79 @@
         ],
         "description": "Покупка или продажа"
       },
+      "CountryStatistics": {
+        "required": [
+          "id",
+          "country",
+          "sum",
+          "currency",
+          "sumRub",
+          "percent"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id",
+            "format": "int32"
+          },
+          "country": {
+            "type": "string",
+            "description": "Страна"
+          },
+          "sum": {
+            "type": "number",
+            "description": "Сумма по объему денег",
+            "format": "double"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "sumRub": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях",
+            "format": "double"
+          },
+          "percent": {
+            "type": "number",
+            "description": "Процент от всей суммы",
+            "format": "double"
+          },
+          "sumRubNow": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях на сейчас",
+            "format": "double"
+          }
+        }
+      },
       "Currency": {
         "enum": [
           "RUB",
           "USD",
-          "EUR"
+          "EUR",
+          "HKD",
+          "CNY",
+          "AED"
         ],
         "description": "Валюта"
+      },
+      "CurrencyAvgPrice": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "avgPrice": {
+            "type": "number",
+            "description": "Средний курс покупки",
+            "format": "double"
+          },
+          "avgPriceNow": {
+            "type": "number",
+            "description": "Средний курс покупки на сейчас",
+            "format": "double"
+          }
+        }
       },
       "Filter": {
         "required": [
@@ -281,6 +546,41 @@
           }
         }
       },
+      "SectorStatistics": {
+        "required": [
+          "id",
+          "sector",
+          "sumRub",
+          "percent"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id",
+            "format": "int32"
+          },
+          "sector": {
+            "type": "string",
+            "description": "Сектор"
+          },
+          "sumRub": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях",
+            "format": "double"
+          },
+          "percent": {
+            "type": "number",
+            "description": "Процент от всей суммы",
+            "format": "double"
+          },
+          "sumRubNow": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях на сейчас",
+            "format": "double"
+          }
+        }
+      },
       "Sort": {
         "required": [
           "direction",
@@ -305,14 +605,6 @@
         "description": "Направления сортировки"
       },
       "Statistics": {
-        "required": [
-          "id",
-          "ticker",
-          "avgPrice",
-          "sumCount",
-          "total",
-          "currency"
-        ],
         "type": "object",
         "properties": {
           "id": {
@@ -331,7 +623,7 @@
           },
           "sumCount": {
             "type": "integer",
-            "description": "Сумма по количеству штук",
+            "description": "Сумма по количеству штук инструментов",
             "format": "int32"
           },
           "total": {
@@ -339,8 +631,34 @@
             "description": "Сумма по объему денег",
             "format": "double"
           },
+          "percent": {
+            "type": "number",
+            "description": "Доля от общего",
+            "format": "double"
+          },
           "currency": {
             "$ref": "#/components/schemas/Currency"
+          },
+          "country": {
+            "type": "string",
+            "description": "Страна"
+          },
+          "sector": {
+            "type": "string",
+            "description": "Сектор (отрасль)"
+          },
+          "type": {
+            "type": "string",
+            "description": "Тип актива"
+          },
+          "source": {
+            "type": "string",
+            "description": "Источник данных"
+          },
+          "sumRubNow": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях на сейчас",
+            "format": "double"
           }
         }
       },
@@ -351,6 +669,10 @@
             "type": "integer",
             "description": "Id",
             "format": "int32"
+          },
+          "exchange": {
+            "type": "string",
+            "description": "Биржа"
           },
           "ticker": {
             "type": "string",
@@ -386,6 +708,41 @@
             "$ref": "#/components/schemas/Broker"
           }
         }
+      },
+      "TypeStatistics": {
+        "required": [
+          "id",
+          "type",
+          "sumRub",
+          "percent"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "description": "Тип активов"
+          },
+          "sumRub": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях",
+            "format": "double"
+          },
+          "percent": {
+            "type": "number",
+            "description": "Процент от всей суммы",
+            "format": "double"
+          },
+          "sumRubNow": {
+            "type": "number",
+            "description": "Сумма по объему денег в рублях на сейчас",
+            "format": "double"
+          }
+        }
       }
     }
   },
@@ -398,6 +755,9 @@
     },
     {
       "name": "BookmarksApi"
+    },
+    {
+      "name": "CurrencyApi"
     }
   ]
 }

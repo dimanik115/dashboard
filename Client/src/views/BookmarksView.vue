@@ -5,12 +5,11 @@
       v-model:expandedRowGroups="expandedRowGroups"
       expandableRowGroups
       rowGroupMode="subheader"
-      groupRowsBy="type"
+      groupRowsBy="group"
       @rowgroup-expand="isShow = true"
       @rowgroup-collapse="isShow = false"
       :value="data"
-      removableSort
-    >
+      removableSort>
       <template #header>
         <div class="header">
           <IconField>
@@ -24,22 +23,25 @@
         </div>
       </template>
       <template #groupheader="slotProps">
-        <strong>{{ slotProps.data.type.toUpperCase() }}</strong>
+        <strong>{{ slotProps.data.group.toUpperCase() }}</strong>
       </template>
-      <template #empty> No data found.</template>
+      <template #empty>No data found.</template>
 
       <Column
         v-for="(col, index) in columns"
         :key="index"
         :field="col.field"
         :header="col.header"
-        :sortable="col.sortable"
-      >
-      </Column>
+        :sortable="col.sortable"></Column>
 
       <Column v-if="isShow" header="url">
         <template #body="{ data }">
-          <a :href="`https://www.tradingview.com/chart/?symbol=${data.source}:${data.ticker}`">ссылка на tradingview</a>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            :href="`https://www.tradingview.com/chart/?symbol=${data.source}:${data.ticker}`">
+            ссылка на tradingview
+          </a>
         </template>
       </Column>
     </DataTable>
@@ -55,6 +57,7 @@ const isShow = ref(false);
 const columns = [
   { field: 'source', header: 'Source', sortable: true },
   { field: 'ticker', header: 'Ticker', sortable: true },
+  { field: 'type', header: 'Type', sortable: true },
   { field: 'country', header: 'country', sortable: true },
   { field: 'sector', header: 'sector', sortable: true },
   { field: 'isBought', header: 'isBought', sortable: true },
@@ -68,7 +71,7 @@ const { data } = useBookmarks();
 function expandAll() {
   expandedRowGroups.value = data.value?.reduce(
     (arr, next) => {
-      if (!arr.includes(next.type)) arr.push(next.type);
+      if (!arr.includes(next.group)) arr.push(next.group);
       return arr;
     },
     [] as Array<string | undefined>,

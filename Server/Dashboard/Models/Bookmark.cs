@@ -13,7 +13,10 @@ public class Bookmark
     /// <summary>Тикер (символ)</summary>
     public string Ticker { get; set; } = null!;
 
-    /// <summary>Мой тип для группировки</summary>
+    /// <summary>Поле для группировки</summary>
+    public string Group { get; set; } = null!;
+
+    /// <summary>Тип актива</summary>
     public string Type { get; set; } = null!;
 
     /// <summary>Страна</summary>
@@ -27,4 +30,7 @@ public class Bookmark
 
     /// <summary>Описание</summary>
     public string? Description { get; set; }
+    
+    /// <summary>Описание</summary>
+    public string? TinkUid { get; set; }
 }

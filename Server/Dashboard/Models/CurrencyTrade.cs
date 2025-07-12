@@ -2,7 +2,7 @@ using MiniExcelLibs.Attributes;
 
 namespace Dashboard.Models;
 
-public class Trade
+public class CurrencyTrade
 {
     /// <summary>Id</summary>
     [ExcelIgnore]
@@ -11,8 +11,8 @@ public class Trade
     /// <summary>Биржа</summary>
     public string Exchange { get; set; } = null!;
 
-    /// <summary>Тикер</summary>
-    public string Ticker { get; set; } = null!;
+    /// <summary>Тикер(первая валюта)</summary>
+    public Currency Currency { get; set; } 
 
     /// <summary>Дата сделки</summary>
     // [ExcelFormat("o")]
@@ -29,19 +29,9 @@ public class Trade
     [ExcelFormat("N2")]
     public decimal Sum { get; set; }
 
-    /// <summary>Валюта</summary>
-    public Currency Currency { get; set; }
-
     /// <summary>Покупка или продажа</summary>
     public BuySell BuySell { get; set; }
 
     /// <summary>Брокер</summary>
     public Broker Broker { get; set; }
-}
-
-public class Seed
-{
-    /// <summary>Сколько вложено</summary>
-    [ExcelColumnIndex("B")]
-    public int Money { get; set; }
 }

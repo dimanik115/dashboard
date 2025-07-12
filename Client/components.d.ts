@@ -31,6 +31,7 @@ declare module 'vue' {
     TabPanel: typeof import('primevue/tabpanel')['default']
     TabPanels: typeof import('primevue/tabpanels')['default']
     Tabs: typeof import('primevue/tabs')['default']
+    TD: typeof import('./src/components/TD.vue')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
   }
 }
