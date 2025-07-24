@@ -23,11 +23,8 @@ builder.Services.AddScoped<RealDataService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi("/{documentName}.json");
-    app.UseSwaggerUI(options => { options.SwaggerEndpoint("/v1.json", "v1"); });
-}
+app.MapOpenApi("/{documentName}.json");
+app.UseSwaggerUI(options => { options.SwaggerEndpoint("/v1.json", "v1"); });
 
 app.UseCors("all");
 

@@ -1,0 +1,13 @@
+﻿services:
+  back:
+    build:
+      context: Server
+      dockerfile: ./Dashboard/Dockerfile
+    ports:
+      - "8080:8080"
+  front:
+    build:
+      context: Client
+      dockerfile: ./Dockerfile
+    ports:
+      - "80:80"

@@ -9,5 +9,11 @@
     <PublishAssetsDirectory>$(MSBuildProjectDirectory)\dist</PublishAssetsDirectory>
     <Configurations>Debug;LocalRelease;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
+  <ItemGroup>
+    <Script Include="..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Script>
+  </ItemGroup>
 </Project>

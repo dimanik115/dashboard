@@ -2,10 +2,10 @@
   <Folder Name="/.Solution Items/">
     <File Path=".gitignore" />
     <File Path="README.md" />
-    <File Path="Directory.Build.props" />
-    <File Path="Directory.Packages.props" />
+    <File Path="Server/Directory.Build.props" />
+    <File Path="Server/Directory.Packages.props" />
     <File Path="assets\Dashboard.json" />
-    <File Path="VaultConfig.json" />
+    <File Path="Server/VaultConfig.json" />
   </Folder>
   <Folder Name="/Server/">
     <Project Path="Server/Dashboard\Dashboard.csproj" Type="Classic C#" />
