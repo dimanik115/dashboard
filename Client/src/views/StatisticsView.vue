@@ -29,12 +29,12 @@
             </Column>
             <Column field="avgPrice" header="avgPrice">
               <template #body="{ data }">
-                {{ isHide ? '*' : formatCurrency(data.avgPrice, { currency: data.currency }) }}
+                {{ isHide ? '*' : formatCurrency(data.avgPrice) }}
               </template>
             </Column>
             <Column v-if="isLive && !isHide" field="avgPriceNow" header="avgPriceNow">
               <template #body="{ data }">
-                {{ isHide ? '*' : formatCurrency(data.avgPriceNow, { currency: data.currency }) }}
+                {{ isHide ? '*' : formatCurrency(data.avgPriceNow) }}
               </template>
             </Column>
           </DataTable>
@@ -49,13 +49,7 @@
           </TabList>
           <TabPanels>
             <TabPanel value="0">
-              <DataTable
-                :value="countryStat"
-                sort-field="sumRub"
-                :sort-order="-1"
-                removable-sort
-                paginator
-                :rows="5"
+              <DataTable :value="countryStat" sort-field="sumRub" :sort-order="-1" removable-sort paginator :rows="5"
                 :alwaysShowPaginator="false">
                 <Column field="country" header="country">
                   <template #body="{ data }">
@@ -85,13 +79,7 @@
               </DataTable>
             </TabPanel>
             <TabPanel value="1">
-              <DataTable
-                :value="sectorStat"
-                sort-field="sumRub"
-                :sort-order="-1"
-                removable-sort
-                paginator
-                :rows="5"
+              <DataTable :value="sectorStat" sort-field="sumRub" :sort-order="-1" removable-sort paginator :rows="5"
                 :alwaysShowPaginator="false">
                 <Column field="sector" header="sector">
                   <template #body="{ data }">
@@ -116,13 +104,7 @@
               </DataTable>
             </TabPanel>
             <TabPanel value="2">
-              <DataTable
-                :value="typeStat"
-                sort-field="sumRub"
-                :sort-order="-1"
-                removable-sort
-                paginator
-                :rows="5"
+              <DataTable :value="typeStat" sort-field="sumRub" :sort-order="-1" removable-sort paginator :rows="5"
                 :alwaysShowPaginator="false">
                 <Column field="type" header="type">
                   <template #body="{ data }">
@@ -151,29 +133,13 @@
       </div>
     </div>
     <ToggleButton :onIcon="PrimeIcons.EYE" :offIcon="PrimeIcons.EYE_SLASH" v-model="isHide" onLabel="" offLabel="" />
-    <ToggleButton
-      :onIcon="PrimeIcons.STOP"
-      :offIcon="PrimeIcons.SYNC"
-      v-model="isLive"
-      onLabel=""
-      offLabel=""
+    <ToggleButton :onIcon="PrimeIcons.STOP" :offIcon="PrimeIcons.SYNC" v-model="isLive" onLabel="" offLabel=""
       @update:model-value="onSync" />
-    <DataTable
-      v-model:filters="filters"
-      v-model:selection="selected"
-      v-model:rows="pageSize"
-      v-model:first="page"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
+    <DataTable v-model:filters="filters" v-model:selection="selected" :rows="pageSize" v-model:first="page"
+      :rowsPerPageOptions="[5, 15, 30]"
       paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-      v-model:currentPageReportTemplate="template"
-      :value="statistics"
-      dataKey="id"
-      filterDisplay="menu"
-      paginator
-      removableSort
-      stripedRows
-      @rowSelect="onRowSelect"
-      selectionMode="single">
+      v-model:currentPageReportTemplate="template" :value="statistics" dataKey="id" filterDisplay="menu" paginator
+      removableSort stripedRows @rowSelect="onRowSelect" selectionMode="single">
       <template #header>
         <div class="">
           <Button icon="pi pi-filter-slash" label="Clear" outlined type="button" @click="clearFilter()" />
@@ -199,7 +165,7 @@
           <InputNumber v-model="filterModel.value" mode="decimal" />
         </template>
       </Column>
-      <Column field="total" header="total" dataType="numeric" sortable>
+      <Column field="total" header="total" dataType="numeric" sortable sortField="sumRubNow">
         <template #body="{ data }">
           {{ isHide ? '*' : formatCurrency(data.total, { currency: data.currency }) }}
         </template>
@@ -248,10 +214,7 @@
     </DataTable>
     <!-- <TD v-if="isLive" :search="search"></TD> -->
     <div style="font-size: xx-large; display: flex; justify-content: center; padding-top: 50px">
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        :href="`https://www.tradingview.com/chart/?symbol=${search}`"
+      <a target="_blank" rel="noopener noreferrer" :href="`https://www.tradingview.com/chart/?symbol=${search}`"
         style="">
         ссылка на tradingview
       </a>
@@ -269,7 +232,7 @@ import {
   useTotalMoney,
 } from '@/shared/api/StatisticsApi';
 import { useSeedMoney } from '@/shared/api/TradesApi.ts';
-import type { Bookmark, Statistics } from '@/shared/generated';
+import type { Statistics } from '@/shared/generated';
 import { useCurrencyOptions } from '@/shared/utils/enums';
 import { formatCurrency } from '@/shared/utils/num';
 import { useLocalStorage } from '@/shared/utils/useLocalStorage';
@@ -277,9 +240,9 @@ import { FilterMatchMode, FilterOperator, PrimeIcons } from '@primevue/core/api'
 import type { DataTableFilterMeta, DataTableRowSelectEvent } from 'primevue/datatable';
 import { computed, ref } from 'vue';
 
-const search = ref('RUS:SIBN');
-const isLive = ref(false);
-const pageSize = ref(10);
+const search = ref('source:ticker');
+const isLive = useLocalStorage('isLive', false);
+const pageSize = ref(15);
 const page = ref(0);
 const isHide = useLocalStorage('isHide', false);
 const filters = ref<DataTableFilterMeta>();
@@ -306,7 +269,7 @@ const initFilters = () => {
     sector: { value: null, matchMode: FilterMatchMode.IN },
     type: { value: null, matchMode: FilterMatchMode.IN },
   };
-  pageSize.value = 10;
+  pageSize.value = 15;
   page.value = 0;
 };
 const clearFilter = () => {
@@ -324,17 +287,17 @@ const statistics = computed(() =>
   !isHide.value
     ? data.value
     : data.value?.map((x) => {
-        const copy = structuredClone({ ...x });
-        copy.avgPrice = -1;
-        copy.sumCount = -1;
-        copy.ticker = '*';
-        copy.total = -1;
-        copy.currency = 'RUB';
-        copy.country = '';
-        copy.sector = '';
-        copy.type = '';
-        return copy;
-      }),
+      const copy = structuredClone({ ...x });
+      copy.avgPrice = -1;
+      copy.sumCount = -1;
+      copy.ticker = '*';
+      copy.total = -1;
+      copy.currency = 'RUB';
+      copy.country = '';
+      copy.sector = '';
+      copy.type = '';
+      return copy;
+    }),
 );
 const template = computed(() => (!isHide.value ? '{first} to {last} of {totalRecords}' : '0'));
 const { data: countryStat } = useStatisticsByCountry(isLive);

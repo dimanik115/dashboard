@@ -17,34 +17,29 @@ public class RealDataService(InvestApiClient apiClient)
     public async Task<Dictionary<Currency, decimal>> GetLastCurrencyRates()
     {
         await CurrencySemaphore.WaitAsync();
-        if (!_currencyRates.Any())
+        try
         {
-            var json = await new HttpClient().GetFromJsonAsync<JsonElement>("https://www.cbr-xml-daily.ru/daily_json.js");
+            if (!_currencyRates.Any())
+            {
+                var json = await new HttpClient().GetFromJsonAsync<JsonElement>("https://www.cbr-xml-daily.ru/daily_json.js");
 
-            // foreach (var currency in Enum.GetValues<Currency>().ToDictionary(x => x, x => 1m))
-            // {
-            //     var val = json.GetProperty("Valute");
-            //     if (val.TryGetProperty(currency.Key.ToString(), out var valVal))
-            //     {
-            //         _currencyRates[currency.Key] =
-            //             valVal.GetProperty("Value").GetDecimal() / valVal.GetProperty("Nominal").GetInt32();
-            //     }
-            // }
-
-            _currencyRates = Enum.GetValues<Currency>().ToDictionary(x => x,
-                x =>
-                {
-                    var valute = json.GetProperty("Valute");
-                    if (valute.TryGetProperty(x.ToString(), out var val))
+                _currencyRates = Enum.GetValues<Currency>().ToDictionary(x => x,
+                    x =>
                     {
-                        return val.GetProperty("Value").GetDecimal() / val.GetProperty("Nominal").GetInt32();
-                    }
+                        var valute = json.GetProperty("Valute");
+                        if (valute.TryGetProperty(x.ToString(), out var val))
+                        {
+                            return val.GetProperty("Value").GetDecimal() / val.GetProperty("Nominal").GetInt32();
+                        }
 
-                    return 1m;
-                });
+                        return 1m;
+                    });
+            }
         }
-
-        CurrencySemaphore.Release();
+        finally
+        {
+            CurrencySemaphore.Release();
+        }
         return _currencyRates;
     }
 

@@ -21,6 +21,6 @@ public static class BookmarksApi
     [ProducesResponseType(400)]
     private static async Task<IResult> GetAllBookmarks([AsParameters] BookmarksRequests requests)
     {
-        return Results.Ok(await requests.Service.GetAll());
+        return Results.Ok(requests.Service.GetAll());
     }
 }

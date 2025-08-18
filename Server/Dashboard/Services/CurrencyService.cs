@@ -4,12 +4,12 @@ using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Dashboard.Services;
 
-public class CurrencyService(IConfiguration configuration, RealDataService realDataService)
+public class CurrencyService(IConfiguration configuration, RealDataService realDataService, ILogger<CurrencyService> logger)
 {
     private readonly string path = configuration.GetValue<string>("ExcelPath")!;
 
     /// <summary>Получить все сделки по валютам</summary>
-    public async Task<List<CurrencyTrade>> GetAll()
+    public IEnumerable<CurrencyTrade> GetAll()
     {
         var result = MiniExcel.Query<CurrencyTrade>(path, "currency").Select((x, i) =>
         {
@@ -20,25 +20,34 @@ public class CurrencyService(IConfiguration configuration, RealDataService realD
     }
 
     /// <summary>Получить все средние курсы валют</summary>
-    public async Task<List<CurrencyAvgPrice>> GetAvgPrices(bool isOnline = false)
+    public async Task<Dictionary<Currency, CurrencyAvgPrice>> GetAvgPrices(bool isOnline = false)
     {
-        var currencyTrades = await GetAll();
-        var res = currencyTrades.GroupBy(x => x.Currency)
-            .Select(x => new CurrencyAvgPrice
+        var map = GetAll().GroupBy(x => x.Currency).ToDictionary(x => x.Key,
+            g => new CurrencyAvgPrice
             {
-                Currency = x.Key,
-                AvgPrice = Math.Round(x.Sum(x => x.Sum) / x.Sum(x => x.Count), 2, MidpointRounding.AwayFromZero)
-            });
+                Currency = g.Key,
+                AvgPrice = Math.Round(g.Sum(x => x.Sum) / g.Sum(x => x.Count), 2, MidpointRounding.AwayFromZero),
+                AvgPriceNow = 1
+            }
+        );
+
+        map[Currency.RUB] = new() { Currency = Currency.RUB, AvgPrice = 1, AvgPriceNow = 1 };
         if (isOnline)
         {
-            var currencyRates = await realDataService.GetLastCurrencyRates();
-            res = res.Select(x =>
+            try
             {
-                x.AvgPriceNow = currencyRates[x.Currency];
-                return x;
-            });
+                var currencyRates = await realDataService.GetLastCurrencyRates();
+                foreach (var rate in map)
+                {
+                    rate.Value.AvgPriceNow = currencyRates[rate.Key];
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(e, "API ERROR");
+            }
         }
 
-        return res.ToList();
+        return map;
     }
 }

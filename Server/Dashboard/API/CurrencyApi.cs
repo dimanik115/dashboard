@@ -20,6 +20,7 @@ public static class CurrencyApi
     [ProducesResponseType(400)]
     private static async Task<IResult> GetAvgPrices([AsParameters] CurrencyRequest request)
     {
-        return Results.Ok(await request.Service.GetAvgPrices(request.IsOnline));
+        var res = await request.Service.GetAvgPrices(request.IsOnline);
+        return Results.Ok(res.Where(x => x.Key != Currency.RUB).Select(x => x.Value));
     }
 }

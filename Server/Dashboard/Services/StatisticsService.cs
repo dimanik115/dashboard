@@ -6,12 +6,13 @@ public class StatisticsService(
     TradeService tradeService,
     BookmarkService bookmarkService,
     CurrencyService currencyService,
-    RealDataService realDataService)
+    RealDataService realDataService
+)
 {
     /// <summary>Получить статистику</summary>
     public async Task<List<Statistics>> GetAll(bool isOnline = false)
     {
-        var bookmarks = await bookmarkService.GetAll();
+        var bookmarks = bookmarkService.GetAll();
         var statTrades = (await tradeService.GetAll(new QueryParams())).GroupBy(x => x.Ticker).Select(g =>
             {
                 var bookmark = bookmarks.FirstOrDefault(b => b.Ticker == g.Key);
@@ -28,16 +29,20 @@ public class StatisticsService(
             .ToList();
 
         var currencyMap = await currencyService.GetAvgPrices();
-        var totalMoney = statTrades.Sum(x =>
-            x!.t.Sum(t => t.Sum * (currencyMap.FirstOrDefault(x => x.Currency == t.Currency)?.AvgPrice ?? 1)));
+        var totalMoney = statTrades.Sum(x => x!.t.Sum(t => t.Sum * currencyMap[t.Currency].AvgPrice));
 
-        var currencyRates = await realDataService.GetLastCurrencyRates();
-        var lastPrices = await realDataService.GetLastPrices(statTrades.Select(x => x!.b.TinkUid).ToList());
+        Dictionary<string, decimal> lastPrices = new();
+        Dictionary<Currency, decimal> currencyRates = new();
+        if (isOnline)
+        {
+            currencyRates = await realDataService.GetLastCurrencyRates();
+            lastPrices = await realDataService.GetLastPrices(statTrades.Select(x => x!.b.TinkUid).ToList());
+        }
 
         var res = from grouping in statTrades
             let cur = grouping.t.First().Currency
             let avgPrice = Math.Round(grouping.total / grouping.sumCount, 2, MidpointRounding.AwayFromZero)
-            orderby grouping.total descending
+            orderby grouping.total * currencyMap[cur].AvgPrice descending
             select new Statistics
             {
                 Id = 0,
@@ -46,7 +51,7 @@ public class StatisticsService(
                 SumCount = grouping.sumCount,
                 Total = grouping.total,
                 Percent = Math.Round(
-                    grouping.total * (currencyMap.FirstOrDefault(x => x.Currency == cur)?.AvgPrice ?? 1) / totalMoney, 2,
+                    grouping.total * currencyMap[cur].AvgPrice / totalMoney * 100, 2,
                     MidpointRounding.AwayFromZero),
                 AvgPrice = avgPrice,
                 Country = grouping.b.Country,
@@ -55,7 +60,7 @@ public class StatisticsService(
                 Source = grouping.b.Source,
                 SumRubNow = isOnline
                     ? grouping.sumCount * lastPrices.GetValueOrDefault(grouping.b.TinkUid ?? "", avgPrice) * currencyRates[cur]
-                    : grouping.total
+                    : grouping.total * currencyMap[cur].AvgPrice
             };
 
         return res.Select((x, i) =>
@@ -71,12 +76,12 @@ public class StatisticsService(
         var currencyMap = await currencyService.GetAvgPrices();
         var statistics = await GetAll(isOnline);
         var total = statistics.Sum(x => x.Total);
-        var bookmarks = await bookmarkService.GetAll();
+        var bookmarks = bookmarkService.GetAll();
         var res = from stat in statistics
             group stat by bookmarks.FirstOrDefault(book => book.Ticker == stat.Ticker).Country
             into elems
             let cur = elems.First().Currency
-            let sumRub = elems.Sum(x => x.Total) * (currencyMap.FirstOrDefault(x => x.Currency == cur)?.AvgPrice ?? 1)
+            let sumRub = elems.Sum(x => x.Total) * currencyMap[cur].AvgPrice
             select new CountryStatistics
             {
                 Id = 0,
@@ -101,12 +106,12 @@ public class StatisticsService(
         var currencyMap = await currencyService.GetAvgPrices();
         var statistics = await GetAll(isOnline);
         var total = statistics.Sum(x => x.Total);
-        var bookmarks = await bookmarkService.GetAll();
+        var bookmarks = bookmarkService.GetAll();
         var res = from stat in statistics
             group stat by bookmarks.FirstOrDefault(book => book.Ticker == stat.Ticker).Sector
             into elems
             let cur = elems.First().Currency
-            let sumRub = elems.Sum(x => x.Total) * (currencyMap.FirstOrDefault(x => x.Currency == cur)?.AvgPrice ?? 1)
+            let sumRub = elems.Sum(x => x.Total) * currencyMap[cur].AvgPrice
             select new SectorStatistics
             {
                 Id = 0,
@@ -128,12 +133,12 @@ public class StatisticsService(
         var currencyMap = await currencyService.GetAvgPrices();
         var statistics = await GetAll(isOnline);
         var total = statistics.Sum(x => x.Total);
-        var bookmarks = await bookmarkService.GetAll();
+        var bookmarks = bookmarkService.GetAll();
         var res = from stat in statistics
             group stat by bookmarks.FirstOrDefault(book => book.Ticker == stat.Ticker).Type
             into elems
             let cur = elems.First().Currency
-            let sumRub = elems.Sum(x => x.Total) * (currencyMap.FirstOrDefault(x => x.Currency == cur)?.AvgPrice ?? 1)
+            let sumRub = elems.Sum(x => x.Total) * currencyMap[cur].AvgPrice
             select new TypeStatistics
             {
                 Id = 0,
@@ -156,8 +161,7 @@ public class StatisticsService(
         var statistics = await GetAll(isOnline);
         var sumRub = isOnline
             ? statistics.Sum(x => x.SumRubNow)
-            : statistics.Sum(x =>
-                x.Total * (currencyMap.FirstOrDefault(price => price.Currency == x.Currency)?.AvgPrice ?? 1));
+            : statistics.Sum(x => x.Total * currencyMap[x.Currency].AvgPrice);
         return Math.Round(sumRub, 2, MidpointRounding.AwayFromZero);
     }
 }
