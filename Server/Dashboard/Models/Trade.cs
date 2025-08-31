@@ -41,7 +41,9 @@ public class Trade
 
 public class Seed
 {
+    /// <summary>Брокер</summary>
+    public Broker Broker { get; set; }
+
     /// <summary>Сколько вложено</summary>
-    [ExcelColumnIndex("B")]
-    public int Money { get; set; }
+    public int SeedMoney { get; set; }
 }

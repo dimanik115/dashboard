@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Dashboard.API;
 using Dashboard.Services;
@@ -11,7 +12,27 @@ if (!string.IsNullOrWhiteSpace(path))
 builder.Services.AddInvestApiClient((provider, settings) =>
     settings.AccessToken = provider.GetRequiredService<IConfiguration>().GetValue<string>("TOKEN"));
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer((schema, context, token) =>
+    {
+        var nullabilityInfoContext = new NullabilityInfoContext();
+        foreach (var property in context.JsonTypeInfo.Type.GetProperties())
+        {
+            if (property.GetCustomAttribute<JsonIgnoreAttribute>() != null) continue;
+            var jsonName = property.Name;
+            if (property.GetCustomAttribute<JsonPropertyNameAttribute>() is { } attr)
+                jsonName = attr.Name;
+            var str = schema.Properties?.Keys.SingleOrDefault(key => string.Equals(key, jsonName, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(str) && nullabilityInfoContext.Create(property).ReadState != NullabilityState.Nullable)
+            {
+                schema.Required ??= [];
+                schema.Required.Add(str);
+            }
+        }
+        return Task.CompletedTask;
+    });
+});
 builder.Services.Configure<JsonOptions>(o => { o.SerializerOptions.NumberHandling = JsonNumberHandling.Strict; });
 builder.Services.AddCors(o => { o.AddPolicy("all", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); });
 

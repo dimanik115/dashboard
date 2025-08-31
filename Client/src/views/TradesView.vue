@@ -15,24 +15,26 @@
       removableSort
       sortMode="multiple"
       stripedRows
-      tableStyle="min-width: 50rem"
-    >
+      tableStyle="min-width: 50rem">
       <template #header>
         <div class="">
           <Button icon="pi pi-filter-slash" label="Clear" outlined type="button" @click="clearFilter()" />
         </div>
       </template>
-      <template #empty> No data found.</template>
+      <template #empty>No data found.</template>
       <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
       <Column field="ticker" header="Ticker" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.ticker }}
+        </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" placeholder="Search by Ticker" type="text" />
         </template>
       </Column>
       <Column field="tradeDate" header="TradeDate" dataType="date" sortable>
         <template #body="{ data }">
-          {{ formatDate(data.tradeDate) }}
+          {{ isHide ? '*' : formatDate(data.tradeDate) }}
         </template>
         <template #filter="{ filterModel }">
           <DatePicker
@@ -41,8 +43,7 @@
             dateFormat="dd.mm.yy"
             placeholder="dd.mm.yyyy"
             showButtonBar
-            @clear-click="filterModel.value = null"
-          />
+            @clear-click="filterModel.value = null" />
         </template>
       </Column>
       <Column field="avgPrice" header="AvgPrice" dataType="numeric" sortable>
@@ -54,6 +55,9 @@
         </template>
       </Column>
       <Column field="count" header="Count" dataType="numeric" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.count }}
+        </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" mode="decimal" />
         </template>
@@ -67,16 +71,25 @@
         </template>
       </Column>
       <Column field="currency" header="Currency" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.currency }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="useCurrencyOptions()" placeholder="Any" />
         </template>
       </Column>
       <Column field="buySell" header="BuySell" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.buySell }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="useBuySellOptions()" placeholder="Any" />
         </template>
       </Column>
       <Column field="broker" header="Broker" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.broker }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="useBrokerOptions()" placeholder="Any" />
         </template>
@@ -132,22 +145,7 @@ const clearFilter = () => {
 initFilters();
 const selected = ref();
 const { data } = useTrades({});
-const trades = computed(() =>
-  !isHide.value
-    ? data.value?.map((x) => ({ ...x, tradeDate: new Date(x.tradeDate!) }))
-    : data.value?.map((x) => {
-        const copy = structuredClone({ ...x });
-        copy.avgPrice = -1;
-        copy.count = -1;
-        copy.sum = -1;
-        copy.tradeDate = '*';
-        copy.ticker = '*';
-        copy.broker = undefined;
-        copy.currency = 'RUB';
-        copy.buySell = undefined;
-        return copy;
-      }),
-);
+const trades = computed(() => data.value?.map((x) => ({ ...x, tradeDate: new Date(x.tradeDate!) })));
 </script>
 
 <style scoped>

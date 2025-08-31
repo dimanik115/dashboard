@@ -58,6 +58,7 @@ public class StatisticsService(
                 Sector = grouping.b.Sector,
                 Type = grouping.b.Type,
                 Source = grouping.b.Source,
+                Color = grouping.b.Color,
                 SumRubNow = isOnline
                     ? grouping.sumCount * lastPrices.GetValueOrDefault(grouping.b.TinkUid ?? "", avgPrice) * currencyRates[cur]
                     : grouping.total * currencyMap[cur].AvgPrice

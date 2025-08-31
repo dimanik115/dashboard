@@ -13,6 +13,9 @@ public record GetOnlineRequest
 {
     [FromServices]
     public StatisticsService Service { get; set; } = null!;
+    
+    [FromServices]
+    public BookmarkService BookmarkService { get; set; } = null!;
 
     [FromQuery]
     public bool IsOnline { get; set; }

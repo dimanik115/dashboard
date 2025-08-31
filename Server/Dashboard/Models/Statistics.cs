@@ -35,6 +35,9 @@ public class Statistics
     /// <summary>Источник данных</summary>
     public string Source { get; set; }
 
+    /// <summary>Цвет для фронта</summary>
+    public string? Color { get; set; }
+
     /// <summary>Сумма по объему денег в рублях на сейчас</summary>
     public decimal SumRubNow { get; set; }
 }

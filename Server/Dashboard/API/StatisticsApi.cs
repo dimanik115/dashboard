@@ -19,15 +19,22 @@ public static class StatisticsApi
         return group;
     }
 
-    [EndpointSummary("Получить статистику")]
+    [EndpointSummary("Получить статистику с учетом онлайн")]
     [Produces<IEnumerable<Statistics>>]
     [ProducesResponseType(400)]
     private static async Task<IResult> GetAllStatistics([AsParameters] GetOnlineRequest request)
     {
-        return Results.Ok(await request.Service.GetAll(request.IsOnline));
+        var res = await request.Service.GetAll(request.IsOnline);
+        var bookmarks = request.BookmarkService.GetAll();
+        return Results.Ok(res.Select(s =>
+        {
+            if (s.Ticker.StartsWith("RU"))
+                s.Ticker = $"{s.Ticker} ({bookmarks.First(b => b.Ticker == s.Ticker).Description})";
+            return s;
+        }));
     }
 
-    [EndpointSummary("Получить статистику по странам")]
+    [EndpointSummary("Получить статистику по странам с учетом онлайн")]
     [Produces<IEnumerable<CountryStatistics>>]
     [ProducesResponseType(400)]
     private static async Task<IResult> GetAllStatisticsByCountry([AsParameters] GetOnlineRequest request)
@@ -35,23 +42,23 @@ public static class StatisticsApi
         return Results.Ok(await request.Service.GetAllByCountry(request.IsOnline));
     }
 
-    [EndpointSummary("Получить статистику по секторам")]
+    [EndpointSummary("Получить статистику по секторам с учетом онлайн")]
     [Produces<IEnumerable<SectorStatistics>>]
     [ProducesResponseType(400)]
     private static async Task<IResult> GetAllStatisticsBySector([AsParameters] GetOnlineRequest request)
     {
         return Results.Ok(await request.Service.GetAllBySector(request.IsOnline));
     }
-    
-    [EndpointSummary("Получить статистику по типу активов")]
+
+    [EndpointSummary("Получить статистику по типу активов с учетом онлайн")]
     [Produces<IEnumerable<TypeStatistics>>]
     [ProducesResponseType(400)]
     private static async Task<IResult> GetAllStatisticsByType([AsParameters] GetOnlineRequest request)
     {
         return Results.Ok(await request.Service.GetAllByType(request.IsOnline));
     }
-    
-    [EndpointSummary("Получить количество денег по всем активам")]
+
+    [EndpointSummary("Получить сумму денег по всем активам с учетом онлайн")]
     [Produces<decimal>]
     [ProducesResponseType(400)]
     private static async Task<IResult> GetTotalMoney([AsParameters] GetOnlineRequest request)

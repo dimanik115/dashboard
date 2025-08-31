@@ -17,8 +17,8 @@ public static class TradesApi
         return group;
     }
 
-    [EndpointSummary("Получить количество вложенных денег")]
-    [Produces<int>]
+    [EndpointSummary("Получить количество вложенных денег по брокерам")]
+    [Produces<IEnumerable<Seed>>]
     [ProducesResponseType(400)]
     private static IResult GetSeedMoney([AsParameters] GetSeedMoneyRequest requests)
     {

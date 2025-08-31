@@ -1,5 +1,5 @@
 import { toValue, type MaybeRefOrGetter } from 'vue';
-import type { QueryParams, Trade } from '../generated';
+import type { QueryParams, Trade, Seed } from '../generated';
 import { useAxios } from '../utils/useAxios';
 import { useQuery } from '@tanstack/vue-query';
 
@@ -10,7 +10,7 @@ async function fetchTrades(params: QueryParams): Promise<Trade[]> {
   return localAxios.post('list', params).then((r) => r.data);
 }
 
-async function fetchSeedMoney(): Promise<number> {
+async function fetchSeedMoney(): Promise<Seed[]> {
   return localAxios.get('getseedmoney').then((r) => r.data);
 }
 

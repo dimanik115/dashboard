@@ -21,11 +21,24 @@ public class TradeService(IConfiguration configuration)
         return result.ToList();
     }
 
-    /// <summary>Получить количество вложенных денег</summary>
-    public int GetSeedMoney()
+    /// <summary>Получить количество вложенных денег по брокерам</summary>
+    public IEnumerable<Seed> GetSeedMoney()
     {
-        var firstRow = MiniExcel.Query<Seed>(path, "общее", hasHeader: false).First();
+        int index = 0;
+        foreach (var row in MiniExcel.Query(path, sheetName: "общее"))
+        {
+            if (row.A == null) break;
+            index++;
+        }
+        var num = "A" + index;
 
-        return firstRow.Money;
+        foreach (var item in MiniExcel.QueryRange(path, true, "общее", endCell: num).Cast<IDictionary<string, object>>())
+        {
+            yield return new Seed
+            {
+                SeedMoney = (int)(double)item["SeedMoney"],
+                Broker = Enum.Parse<Broker>(item["Broker"].ToString()!, true)
+            };
+        }
     }
 }

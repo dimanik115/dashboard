@@ -1,43 +1,72 @@
 <template>
   <div>
     <div class="top-data">
-      <div class="my-field">
-        <h3>
-          Всего вложено:
-          <span v-if="isSuccessSeedMoney">
-            {{ isHide ? 0 : formatCurrency(seedMoney!, { maxFractionDigits: 0 }) }}
-          </span>
-        </h3>
-        <h3>
-          Всего куплено:
-          <span v-if="isSuccessTotalMoney">
-            {{ isHide ? 0 : formatCurrency(totalMoney!, { maxFractionDigits: 0 }) }}
-          </span>
-        </h3>
-        <h3 v-if="isLive">
-          Всего на сейчас:
-          <span v-if="isSuccessTotalMoneyNow">
-            {{ isHide ? 0 : formatCurrency(totalMoneyNow!, { maxFractionDigits: 0 }) }}
-          </span>
-        </h3>
-        <div class="currency-table">
-          <DataTable :value="avgPrices">
-            <Column field="currency" header="currency">
-              <template #body="{ data }">
-                {{ isHide ? '*' : data.currency }}
+      <div class="first-col">
+        <div class="my-field">
+          <h3>
+            Всего куплено:
+            <span v-if="isSuccessTotalMoney">
+              {{ isHide ? 0 : formatCurrency(totalMoney!, { maxFractionDigits: 0 }) }}
+            </span>
+          </h3>
+          <h3>
+            Доход примерно 1% в мес:
+            {{ isHide ? 0 : formatCurrency(totalMoney! / 100, { maxFractionDigits: 0 }) }}
+          </h3>
+          <h3 v-if="isLive">
+            Всего на сейчас:
+            <span v-if="isSuccessTotalMoneyNow">
+              {{ isHide ? 0 : formatCurrency(totalMoneyNow!, { maxFractionDigits: 0 }) }}
+            </span>
+          </h3>
+        </div>
+        <div class="seed-and-cur-tables">
+          <div class="seed-table">
+            <DataTable :value="seedMoney">
+              <Column field="broker" header="broker">
+                <template #body="{ data }">
+                  {{ isHide ? '*' : data.broker }}
+                </template>
+              </Column>
+              <Column field="seedMoney" header="seedMoney">
+                <template #body="{ data }">
+                  {{ isHide ? '*' : formatCurrency(data.seedMoney, { maxFractionDigits: 0 }) }}
+                </template>
+              </Column>
+              <template #footer v-if="isSuccessSeedMoney">
+                <i>
+                  Всего вложено:
+                  {{
+                    isHide
+                      ? 0
+                      : formatCurrency(
+                          seedMoney!.reduce((prev, cur) => prev + cur.seedMoney!, 0),
+                          { maxFractionDigits: 0 },
+                        )
+                  }}
+                </i>
               </template>
-            </Column>
-            <Column field="avgPrice" header="avgPrice">
-              <template #body="{ data }">
-                {{ isHide ? '*' : formatCurrency(data.avgPrice) }}
-              </template>
-            </Column>
-            <Column v-if="isLive && !isHide" field="avgPriceNow" header="avgPriceNow">
-              <template #body="{ data }">
-                {{ isHide ? '*' : formatCurrency(data.avgPriceNow) }}
-              </template>
-            </Column>
-          </DataTable>
+            </DataTable>
+          </div>
+          <div class="currency-table">
+            <DataTable :value="avgPrices">
+              <Column field="currency" header="currency">
+                <template #body="{ data }">
+                  {{ isHide ? '*' : data.currency }}
+                </template>
+              </Column>
+              <Column field="avgPrice" header="avgPrice">
+                <template #body="{ data }">
+                  {{ isHide ? '*' : formatCurrency(data.avgPrice) }}
+                </template>
+              </Column>
+              <Column v-if="isLive && !isHide" field="avgPriceNow" header="avgPriceNow">
+                <template #body="{ data }">
+                  {{ isHide ? '*' : formatCurrency(data.avgPriceNow) }}
+                </template>
+              </Column>
+            </DataTable>
+          </div>
         </div>
       </div>
       <div class="ministat-table">
@@ -49,7 +78,13 @@
           </TabList>
           <TabPanels>
             <TabPanel value="0">
-              <DataTable :value="countryStat" sort-field="sumRub" :sort-order="-1" removable-sort paginator :rows="5"
+              <DataTable
+                :value="countryStat"
+                sort-field="sumRub"
+                :sort-order="-1"
+                removable-sort
+                paginator
+                :rows="5"
                 :alwaysShowPaginator="false">
                 <Column field="country" header="country">
                   <template #body="{ data }">
@@ -79,7 +114,13 @@
               </DataTable>
             </TabPanel>
             <TabPanel value="1">
-              <DataTable :value="sectorStat" sort-field="sumRub" :sort-order="-1" removable-sort paginator :rows="5"
+              <DataTable
+                :value="sectorStat"
+                sort-field="sumRub"
+                :sort-order="-1"
+                removable-sort
+                paginator
+                :rows="5"
                 :alwaysShowPaginator="false">
                 <Column field="sector" header="sector">
                   <template #body="{ data }">
@@ -104,7 +145,13 @@
               </DataTable>
             </TabPanel>
             <TabPanel value="2">
-              <DataTable :value="typeStat" sort-field="sumRub" :sort-order="-1" removable-sort paginator :rows="5"
+              <DataTable
+                :value="typeStat"
+                sort-field="sumRub"
+                :sort-order="-1"
+                removable-sort
+                paginator
+                :rows="5"
                 :alwaysShowPaginator="false">
                 <Column field="type" header="type">
                   <template #body="{ data }">
@@ -133,13 +180,30 @@
       </div>
     </div>
     <ToggleButton :onIcon="PrimeIcons.EYE" :offIcon="PrimeIcons.EYE_SLASH" v-model="isHide" onLabel="" offLabel="" />
-    <ToggleButton :onIcon="PrimeIcons.STOP" :offIcon="PrimeIcons.SYNC" v-model="isLive" onLabel="" offLabel=""
+    <ToggleButton
+      :onIcon="PrimeIcons.STOP"
+      :offIcon="PrimeIcons.SYNC"
+      v-model="isLive"
+      onLabel=""
+      offLabel=""
       @update:model-value="onSync" />
-    <DataTable v-model:filters="filters" v-model:selection="selected" :rows="pageSize" v-model:first="page"
+    <DataTable
+      v-model:filters="filters"
+      v-model:selection="selected"
+      :rows="pageSize"
+      v-model:first="page"
+      v-model:sort-field="sort"
       :rowsPerPageOptions="[5, 15, 30]"
       paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-      v-model:currentPageReportTemplate="template" :value="statistics" dataKey="id" filterDisplay="menu" paginator
-      removableSort stripedRows @rowSelect="onRowSelect" selectionMode="single">
+      v-model:currentPageReportTemplate="template"
+      :value="statistics"
+      dataKey="id"
+      filterDisplay="menu"
+      paginator
+      removableSort
+      stripedRows
+      @rowSelect="onRowSelect"
+      selectionMode="single">
       <template #header>
         <div class="">
           <Button icon="pi pi-filter-slash" label="Clear" outlined type="button" @click="clearFilter()" />
@@ -147,7 +211,16 @@
       </template>
       <template #empty>No data found.</template>
 
-      <Column field="ticker" header="Ticker" sortable>
+      <Column field="ticker" header="Ticker" sortable body-style="padding:0">
+        <template #body="{ data }">
+          <span
+            v-if="!isHide"
+            class="ticker-color"
+            :style="{ 'background-color': hexToRGBA(data.color ?? '#FFFFFF', 0.6) }">
+            <b>{{ data.ticker }}</b>
+          </span>
+          <span v-else>*</span>
+        </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" placeholder="Search by Ticker" type="text" />
         </template>
@@ -161,6 +234,9 @@
         </template>
       </Column>
       <Column field="sumCount" header="sumCount" dataType="numeric" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.sumCount }}
+        </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" mode="decimal" />
         </template>
@@ -182,21 +258,33 @@
         </template>
       </Column>
       <Column field="currency" header="Currency" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.currency }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="useCurrencyOptions()" placeholder="Any" />
         </template>
       </Column>
       <Column field="country" header="Country" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.country }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="countryStat?.map((x) => x.country)" placeholder="Any" />
         </template>
       </Column>
       <Column field="sector" header="Sector" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.sector }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="sectorStat?.map((x) => x.sector)" placeholder="Any" />
         </template>
       </Column>
       <Column field="type" header="Type" :showFilterMatchModes="false" sortable>
+        <template #body="{ data }">
+          {{ isHide ? '*' : data.type }}
+        </template>
         <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="typeStat?.map((x) => x.type)" placeholder="Any" />
         </template>
@@ -214,7 +302,10 @@
     </DataTable>
     <!-- <TD v-if="isLive" :search="search"></TD> -->
     <div style="font-size: xx-large; display: flex; justify-content: center; padding-top: 50px">
-      <a target="_blank" rel="noopener noreferrer" :href="`https://www.tradingview.com/chart/?symbol=${search}`"
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        :href="`https://www.tradingview.com/chart/?symbol=${search}`"
         style="">
         ссылка на tradingview
       </a>
@@ -236,6 +327,7 @@ import type { Statistics } from '@/shared/generated';
 import { useCurrencyOptions } from '@/shared/utils/enums';
 import { formatCurrency } from '@/shared/utils/num';
 import { useLocalStorage } from '@/shared/utils/useLocalStorage';
+import { hexToRGBA } from '@/shared/utils/useRgba';
 import { FilterMatchMode, FilterOperator, PrimeIcons } from '@primevue/core/api';
 import type { DataTableFilterMeta, DataTableRowSelectEvent } from 'primevue/datatable';
 import { computed, ref } from 'vue';
@@ -244,6 +336,7 @@ const search = ref('source:ticker');
 const isLive = useLocalStorage('isLive', false);
 const pageSize = ref(15);
 const page = ref(0);
+const sort = ref('');
 const isHide = useLocalStorage('isHide', false);
 const filters = ref<DataTableFilterMeta>();
 const initFilters = () => {
@@ -271,6 +364,7 @@ const initFilters = () => {
   };
   pageSize.value = 15;
   page.value = 0;
+  sort.value = '';
 };
 const clearFilter = () => {
   initFilters();
@@ -282,23 +376,7 @@ const { data: totalMoney, isSuccess: isSuccessTotalMoney } = useTotalMoney(false
 const { data: totalMoneyNow, isSuccess: isSuccessTotalMoneyNow } = useTotalMoney(isLive);
 
 const selected = ref();
-const { data } = useStatistics(isLive);
-const statistics = computed(() =>
-  !isHide.value
-    ? data.value
-    : data.value?.map((x) => {
-      const copy = structuredClone({ ...x });
-      copy.avgPrice = -1;
-      copy.sumCount = -1;
-      copy.ticker = '*';
-      copy.total = -1;
-      copy.currency = 'RUB';
-      copy.country = '';
-      copy.sector = '';
-      copy.type = '';
-      return copy;
-    }),
-);
+const { data: statistics } = useStatistics(isLive);
 const template = computed(() => (!isHide.value ? '{first} to {last} of {totalRecords}' : '0'));
 const { data: countryStat } = useStatisticsByCountry(isLive);
 const { data: sectorStat } = useStatisticsBySector(isLive);
@@ -310,27 +388,40 @@ function onSync(bool: boolean) {
   }
 }
 function onRowSelect(event: DataTableRowSelectEvent<Statistics>) {
-  search.value = event.data.source + ':' + event.data.ticker;
+  search.value = event.data.source + ':' + event.data.ticker?.split(' ')[0];
 }
 </script>
 
 <style scoped>
 .my-field {
-  width: 500px;
-  padding-bottom: 40px;
-  padding-right: 100px;
   color: hsla(160, 100%, 37%, 1);
 }
 
 .top-data {
   display: flex;
+  /* align-items: center; */
+  padding-bottom: 40px;
+}
+
+.seed-and-cur-tables {
+  display: flex;
+  border: ridge hsla(160, 100%, 37%, 1);
+}
+
+.seed-table {
+  padding-right: 80px;
+}
+.currency-table {
+  padding-right: 40px;
 }
 
 .ministat-table {
-  font-size: large;
+  margin: auto;
 }
 
-.currency-table {
-  padding-top: 15px;
+.ticker-color {
+  padding: 10px 0px 10px 10px;
+  display: flex;
+  border-radius: 10px;
 }
 </style>

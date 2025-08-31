@@ -36,5 +36,6 @@ public enum Currency
     EUR,
     HKD,
     CNY,
-    AED
+    AED,
+    JPY
 }

@@ -30,7 +30,10 @@ public class Bookmark
 
     /// <summary>Описание</summary>
     public string? Description { get; set; }
-    
+
     /// <summary>Описание</summary>
     public string? TinkUid { get; set; }
+
+    /// <summary>Цвет для фронта</summary>
+    public string? Color { get; set; }
 }

@@ -46,15 +46,17 @@
         "tags": [
           "TradesApi"
         ],
-        "summary": "Получить количество вложенных денег",
+        "summary": "Получить количество вложенных денег по брокерам",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int32"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Seed"
+                  }
                 }
               }
             }
@@ -70,7 +72,7 @@
         "tags": [
           "StatisticsApi"
         ],
-        "summary": "Получить статистику",
+        "summary": "Получить статистику с учетом онлайн",
         "parameters": [
           {
             "name": "IsOnline",
@@ -106,7 +108,7 @@
         "tags": [
           "StatisticsApi"
         ],
-        "summary": "Получить статистику по странам",
+        "summary": "Получить статистику по странам с учетом онлайн",
         "parameters": [
           {
             "name": "IsOnline",
@@ -142,7 +144,7 @@
         "tags": [
           "StatisticsApi"
         ],
-        "summary": "Получить статистику по секторам",
+        "summary": "Получить статистику по секторам с учетом онлайн",
         "parameters": [
           {
             "name": "IsOnline",
@@ -178,7 +180,7 @@
         "tags": [
           "StatisticsApi"
         ],
-        "summary": "Получить статистику по типу активов",
+        "summary": "Получить статистику по типу активов с учетом онлайн",
         "parameters": [
           {
             "name": "IsOnline",
@@ -214,7 +216,7 @@
         "tags": [
           "StatisticsApi"
         ],
-        "summary": "Получить количество денег по всем активам",
+        "summary": "Получить сумму денег по всем активам с учетом онлайн",
         "parameters": [
           {
             "name": "IsOnline",
@@ -309,6 +311,16 @@
   "components": {
     "schemas": {
       "Bookmark": {
+        "required": [
+          "id",
+          "source",
+          "ticker",
+          "group",
+          "type",
+          "country",
+          "sector",
+          "isBought"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -356,6 +368,13 @@
               "string"
             ],
             "description": "Описание"
+          },
+          "color": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Цвет для фронта"
           }
         }
       },
@@ -388,7 +407,8 @@
           "sum",
           "currency",
           "sumRub",
-          "percent"
+          "percent",
+          "sumRubNow"
         ],
         "type": "object",
         "properties": {
@@ -433,11 +453,17 @@
           "EUR",
           "HKD",
           "CNY",
-          "AED"
+          "AED",
+          "JPY"
         ],
         "description": "Валюта"
       },
       "CurrencyAvgPrice": {
+        "required": [
+          "currency",
+          "avgPrice",
+          "avgPriceNow"
+        ],
         "type": "object",
         "properties": {
           "currency": {
@@ -551,7 +577,8 @@
           "id",
           "sector",
           "sumRub",
-          "percent"
+          "percent",
+          "sumRubNow"
         ],
         "type": "object",
         "properties": {
@@ -581,6 +608,23 @@
           }
         }
       },
+      "Seed": {
+        "required": [
+          "broker",
+          "seedMoney"
+        ],
+        "type": "object",
+        "properties": {
+          "broker": {
+            "$ref": "#/components/schemas/Broker"
+          },
+          "seedMoney": {
+            "type": "integer",
+            "description": "Сколько вложено",
+            "format": "int32"
+          }
+        }
+      },
       "Sort": {
         "required": [
           "direction",
@@ -605,6 +649,20 @@
         "description": "Направления сортировки"
       },
       "Statistics": {
+        "required": [
+          "id",
+          "ticker",
+          "avgPrice",
+          "sumCount",
+          "total",
+          "percent",
+          "currency",
+          "country",
+          "sector",
+          "type",
+          "source",
+          "sumRubNow"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -655,6 +713,13 @@
             "type": "string",
             "description": "Источник данных"
           },
+          "color": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Цвет для фронта"
+          },
           "sumRubNow": {
             "type": "number",
             "description": "Сумма по объему денег в рублях на сейчас",
@@ -663,6 +728,18 @@
         }
       },
       "Trade": {
+        "required": [
+          "id",
+          "exchange",
+          "ticker",
+          "tradeDate",
+          "avgPrice",
+          "count",
+          "sum",
+          "currency",
+          "buySell",
+          "broker"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -714,7 +791,8 @@
           "id",
           "type",
           "sumRub",
-          "percent"
+          "percent",
+          "sumRubNow"
         ],
         "type": "object",
         "properties": {
